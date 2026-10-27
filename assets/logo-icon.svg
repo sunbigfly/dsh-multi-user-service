@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="16 16 96 96" fill="none">
+  <title>DSH 多用户服务</title>
+  <desc>Three softly colored member nodes meet at one shared workspace on a transparent background.</desc>
+  <defs>
+    <linearGradient id="members" x1="27" y1="27" x2="96" y2="103" gradientUnits="userSpaceOnUse"><stop stop-color="#78D5CF"/><stop offset=".52" stop-color="#7FA9F7"/><stop offset="1" stop-color="#8878EB"/></linearGradient>
+    <linearGradient id="workspace" x1="51" y1="49" x2="77" y2="75" gradientUnits="userSpaceOnUse"><stop stop-color="#BACFFF"/><stop offset="1" stop-color="#8C8CEF"/></linearGradient>
+  </defs>
+  <path d="M38 39L64 62L90 39M64 62V91" stroke="url(#members)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="38" cy="39" r="12" fill="url(#members)"/>
+  <circle cx="90" cy="39" r="12" fill="url(#members)"/>
+  <circle cx="64" cy="91" r="12" fill="url(#members)"/>
+  <rect x="51" y="49" width="26" height="26" rx="9" fill="url(#workspace)"/>
+</svg>

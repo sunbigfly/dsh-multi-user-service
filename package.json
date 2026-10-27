@@ -1,0 +1,113 @@
+{
+  "name": "@sunbigfly/dsh-multi-user-service",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Server-side multi-user extension for DSH: individual accounts, per-user permissions, private conversations and files, and usage and concurrency limits on one shared server.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22",
+    "dsh": "0.2.1-rc.2"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./member-host": "./member-host.mjs",
+    "./tool-origins": "./carrier/tool-origins.mjs",
+    "./tool-origins/locale/*.json": "./locale/tool-origins/*.json",
+    "./tool-origins/icon": "./assets/logo-icon.svg",
+    "./core": "./core/service.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./assets/logo-icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "member-host.mjs",
+    "http.js",
+    "domain-store.js",
+    "client.js",
+    "native-client.js",
+    "core/*.js",
+    "runtime/*.mjs",
+    "runtime/*.js",
+    "carrier/*.mjs",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "locale/tool-origins/*.json",
+    "assets/logo-icon.svg",
+    "assets/logo-icon.png",
+    "assets/logo.png",
+    "docs/operations.md",
+    "docs/store-verification.md",
+    "ops/*.py",
+    "ops/*.mjs",
+    "ops/*.sh",
+    "ops/*.service",
+    "ops/*.timer",
+    "ops/*.vbs",
+    "README.md",
+    "CONTRACT.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node --check index.js && node --check member-host.mjs && node --check http.js && node --check domain-store.js && node --check client.js && node --check native-client.js && node --check core/service.js && node --check core/store.js && node --check core/lifecycle.js",
+    "release:index": "node scripts/build-market-index.mjs"
+  },
+  "dependencies": {
+    "zod": "4.6.7",
+    "ws": "^8.21.3",
+    "@deepseek-ai/dsh-api-gateway": "0.2.1-rc.2",
+    "@deepseek-ai/cordis": "4.0.5",
+    "@deepseek-ai/schemastery": "3.18.5"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "compatibility": {
+      "dsh": "0.2.1-rc.2",
+      "node": ">=22",
+      "profiles": ["web"],
+      "dshReleases": {
+        "0.2.1-rc.1": "unknown",
+        "0.2.1-rc.2": "compatible",
+        "0.2.1-rc.3": "unknown"
+      },
+      "dshOperations": {
+        "0.2.1-rc.2": {
+          "install": "passed",
+          "start": "passed",
+          "uninstall": "passed",
+          "rollback": "unknown"
+        }
+      }
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sunbigfly/dsh-multi-user-service.git"
+  },
+  "homepage": "https://github.com/sunbigfly/dsh-multi-user-service#readme",
+  "bugs": {
+    "url": "https://github.com/sunbigfly/dsh-multi-user-service/issues"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "multi-user",
+    "team",
+    "permissions",
+    "self-hosted"
+  ]
+}

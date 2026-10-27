@@ -1,0 +1,8 @@
+- id: tools
+  inject:
+    - lanToolOrigins
+- insert:
+    - id: multi-user-tool-origins
+      name: '@sunbigfly/dsh-multi-user-service/tool-origins'
+    - id: multi-user-service
+      name: '@sunbigfly/dsh-multi-user-service'

@@ -1,0 +1,11 @@
+[Unit]
+Description=Private DSH LAN backup while idle
+
+[Service]
+Type=oneshot
+WorkingDirectory=@DSH_LAN_ROOT@
+ExecStart=/usr/bin/python3 @DSH_LAN_BACKUP@ create --scheduled
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=TZ=Asia/Shanghai
+UMask=0077
+TimeoutStartSec=30min

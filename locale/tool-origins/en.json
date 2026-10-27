@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Tool Permission Origins",
+    "description": "Record each tool’s plugin or MCP origin so the multi-user service can enforce per-member tool permissions."
+  }
+}

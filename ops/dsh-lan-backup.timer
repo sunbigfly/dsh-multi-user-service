@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily DSH backup; retry idle hours after 03:35
+
+[Timer]
+OnCalendar=*-*-* 03..23:35:00 Asia/Shanghai
+Persistent=true
+Unit=dsh-lan-backup.service
+
+[Install]
+WantedBy=timers.target
