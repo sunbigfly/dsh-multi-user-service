@@ -2,7 +2,7 @@ window.__ModuleLoader__.load({
   id: '@sunbigfly/dsh-multi-user-service',
   factory(require) {
     const React = require('react');
-    const { Menu, Modal, Switch, IconCloseOutlineRegular, IconRefreshOutlineRegular,
+    const { Menu, Modal, Switch, Tooltip, IconInfoOutlineRegular, IconCloseOutlineRegular, IconRefreshOutlineRegular,
       IconUserOutlineRegular, IconUsersOutlineRegular, IconSlidersTwoOutlineRegular, IconFolderOpenOutlineRegular,
       IconDatabaseOutlineRegular, IconShareOutlineRegular, IconPersonalizationOutlineRegular, IconGaugeOutlineRegular,
       IconSparkleRegular, IconCheckCircleOutlineRegular, IconShieldOutlineRegular, IconSkillOutlineRegular,
@@ -201,6 +201,9 @@ window.__ModuleLoader__.load({
     };
 
     Object.assign(messages.zh, {
+      executionManualTab: '指定工具', executionScannedTab: '扫描工具', executionDialogNote: '管理服务器命令与工具授权。', executionManualHint: '添加服务器上已安装的命令，也可导入已有配置。', executionScannedHint: '从已登记的来源扫描工具，再配置使用范围。', executionMore: '更多操作', executionNotes: '使用说明', sharingResourcesTab: '资源概览', sessionsDescription: '按成员查看和管理会话记录。', filesDescription: '按成员管理个人目录内的文件与文件夹。', ownSessionsDescription: '查看和管理自己的会话记录。', ownFilesDescription: '管理自己目录内的文件与文件夹。',
+      toolsPerPage: '每页工具数', executionToolsCount: '个工具', navigationPersonal: '个人', navigationWorkspace: '工作区', navigationManagement: '服务管理',
+      toolBlacklist: '黑名单 · 默认开放', toolWhitelist: '白名单 · 仅允许所选', toolBlacklistNote: '勾选要禁用的工具；不勾选则全部开放，新增工具默认可用。功能和资源权限同时生效。', toolWhitelistNote: '勾选要允许的工具；不勾选则全部禁用，新增工具需单独允许。功能和资源权限同时生效。',
       manageAccountAccess: '管理账号授权', permissionsHint: '默认继承宿主配置，可按需调整功能与访问范围。', inheritSummary: '继承宿主', customSummary: '自定义', directoryCount: '个共享目录', personalDirectoryOnly: '仅个人目录', cancelEdit: '取消', accountRows: '个账号', accountPageSize: '每页账号', filterAll: '全部', filterEnabled: '启用', filterDisabled: '已禁用', accountVariants: '模型权限',
       workspaceInfo: '使用说明', helpIntro: '一套 DSH 服务供团队多人使用，管理员统一管理，每位成员拥有独立的会话与文件空间。', accessHelp: '成员入口', accessNote: '将此地址分享给能访问服务器的成员，使用各自的成员账号登录。', memberEntryMissing: '成员入口暂不可用，请刷新状态或检查服务端地址设置。', runtimeStatus: 'DSH 执行环境', runtimeAutoCheck: '沿用 DSH 原生能力', isolationNote: '成员文件、脚本、终端和代码执行仅可读写本人目录与授权共享目录；完全访问不能越过此边界。未通过原生目录隔离校验时禁止执行。', checkIsolation: '检查运行环境', helpDirectory: '界面按账号管理会话与文件，管理员可管理成员内容；共享目录由管理员另行授权。', helpSharing: '模型、工具插件、Skills 和 MCP 沿用宿主配置。管理员可在账号授权中调整各成员的可用范围。',
       usageUnknown: '部分记录的用量未知；带 ≥ 的数字为已知用量，未将未知部分计作 0。',
@@ -220,6 +223,9 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
       contentTab: '会话与文件', contentNote: '按成员查看会话记录，管理个人目录内的文件。', contentSessions: '会话', contentFiles: '文件', contentAllUsers: '所有成员', contentMember: '成员', contentSearch: '搜索会话名称或成员', contentArchived: '显示已归档会话', contentEmpty: '没有匹配的会话。', contentEmptyFolder: '此目录为空。', contentRefresh: '刷新', contentOwner: '所属成员', contentStatus: '状态', contentActions: '操作', contentManage: '管理', contentView: '查看记录', contentRename: '重命名', contentArchive: '归档', contentRestore: '恢复', contentStop: '停止运行', contentHistory: '会话记录', contentOlder: '加载更早记录', contentRunning: '运行中', contentIdle: '空闲', contentArchivedState: '已归档', contentOpenFiles: '管理文件', contentFolder: '文件夹', contentFile: '文件', contentLink: '符号链接', contentSize: '大小', contentRoot: '个人目录', contentUp: '上一级', contentNewFolder: '新建文件夹', contentNewFile: '新建文件', contentUpload: '上传文件', contentDownload: '下载', contentReplace: '替换文件', contentMove: '移动', contentDelete: '删除', contentName: '名称', contentDestination: '目标目录（相对个人目录）', contentText: '文件内容', contentBinary: '此文件不支持在线编辑，可下载或替换原文件。', contentBound: '会话工作目录位置固定，可管理其中的文件与子目录。', contentConfirmDelete: '删除此项及其中的所有内容？此操作无法撤销。', contentSave: '保存', contentCreate: '创建', contentCancel: '取消', contentPrev: '上一页', contentNext: '下一页', contentCount: '共', contentFailed: '操作失败，请重试。', contentDone: '已完成', contentBusy: '正在处理', contentCancelTransfer: '取消传输', contentRowTitle: '会话名称', contentModified: '最后修改', contentMessageUser: '成员', contentMessageAssistant: '助手', contentMessageTool: '工具', contentConflict: '内容已被修改，请重新加载后再保存。', contentExists: '目标已存在，请选择其他名称。', contentLinkDenied: '不能通过符号链接访问目录或文件。', contentTruncated: '内容较长，仅显示前 64K 字符。',
     });
     Object.assign(messages.en, {
+      executionManualTab: 'Specified tools', executionScannedTab: 'Scanned tools', executionDialogNote: 'Manage server commands and tool access.', executionManualHint: 'Add commands installed on the server, or import an existing configuration.', executionScannedHint: 'Scan registered sources, then configure tool access.', executionMore: 'More actions', executionNotes: 'Usage notes', sharingResourcesTab: 'Resources', sessionsDescription: 'Review and manage conversations by member.', filesDescription: 'Manage files and folders in member directories.', ownSessionsDescription: 'Review and manage your own conversations.', ownFilesDescription: 'Manage files and folders in your own directory.',
+      toolsPerPage: 'Tools per page', executionToolsCount: 'tools', navigationPersonal: 'Personal', navigationWorkspace: 'Workspace', navigationManagement: 'Service management',
+      toolBlacklist: 'Blacklist · allow by default', toolWhitelist: 'Whitelist · selected tools only', toolBlacklistNote: 'Check tools to block. An empty list allows all tools, including new tools. Feature and resource permissions still apply.', toolWhitelistNote: 'Check tools to allow. An empty list blocks all tools; new tools require selection. Feature and resource permissions still apply.',
       manageAccountAccess: 'Manage account access', permissionsHint: 'Host settings are inherited by default. Adjust capabilities and scope as needed.', inheritSummary: 'Inherit host', customSummary: 'Custom', directoryCount: 'shared directories', personalDirectoryOnly: 'Personal directory only', cancelEdit: 'Cancel', accountRows: 'accounts', accountPageSize: 'Accounts per page', filterAll: 'All', filterEnabled: 'Enabled', filterDisabled: 'Disabled', accountVariants: 'Model access',
       workspaceInfo: 'Workspace guide', helpIntro: 'One DSH server for your team, with central administration and individual conversations and files.', accessHelp: 'Member entry', accessNote: 'Share this address with members who can reach the server. Each member signs in with their own account.', memberEntryMissing: 'The member address is unavailable. Refresh or check the server address settings.', runtimeStatus: 'DSH execution', runtimeAutoCheck: 'Native DSH providers', isolationNote: 'Member files, scripts, terminals and code stay within personal and authorized shared directories. Full access cannot remove this boundary. Execution is denied when native directory enforcement is unavailable.', checkIsolation: 'Check runtime', helpDirectory: 'Conversations and managed files are scoped by account. Administrators can manage member content and grant shared directories.', helpSharing: 'Models, tool plugins, Skills and MCP use the host configuration. Administrators can adjust each account’s access.',
       usageUnknown: 'Some records have unknown usage. Values marked ≥ show known usage; unknown amounts are not counted as zero.',
@@ -293,8 +299,8 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
     Object.assign(messages.en, { personalTab: 'My capabilities', preferencesDescription: 'Choose personal capabilities within administrator grants. Only your account is affected.', personalScope: 'Personal switches do not install or stop host plugins or MCP servers, or change other members’ settings.', personalApplyNote: 'Saving stops your current execution resources. Reopen conversations to use the new choices.', personalFunctions: 'Features', personalNoResources: 'No authorized resources are currently available.', personalAdminOff: 'Disabled by the administrator', personalEnabled: 'Enabled', personalSelected: 'Selected', personalSave: 'Save personal preferences', personalDefaults: 'Use all authorized capabilities', personalReload: 'Reload and discard draft', personalConflict: 'Preferences changed on another page. Reload before editing.', personalUnavailable: 'Personal capability catalog is unavailable. Refresh to retry.', ownContentDescription: 'Manage your own conversations, files and folders.', ownFilesDisabled: 'File management is disabled. Review your grants and personal switches in My capabilities.' });
     Object.assign(messages.zh, { accessCapabilities: '能力权限', accessCapabilitiesNote: '设置成员可用的功能与资源，作为个人能力选择的授权上限。' });
     Object.assign(messages.en, { accessCapabilities: 'Capabilities', accessCapabilitiesNote: 'Set the features and resources available for this member’s personal choices.' });
-    Object.assign(messages.zh, { personalPreview: '文件预览', personalPreviewReadOnly: '当前为文件只读预览，编辑请返回“会话与文件”。' });
-    Object.assign(messages.en, { personalPreview: 'File preview', personalPreviewReadOnly: 'Read-only file preview. Return to Sessions & files to edit.' });
+    Object.assign(messages.zh, { personalPreview: '文件预览', personalPreviewReadOnly: '当前为文件只读预览，编辑请返回“文件”。' });
+    Object.assign(messages.en, { personalPreview: 'File preview', personalPreviewReadOnly: 'Read-only file preview. Return to Files to edit.' });
     Object.assign(messages.zh, { batchAccess: '批量设置权限', batchSelected: '个账号已选', batchApply: '应用到所选账号', batchClear: '清空选择', batchPage: '选择本页账号', batchSelect: '选择账号', batchScope: '将此权限范围应用到所选账号', batchNote: '只覆盖勾选的权限范围；身份、角色、密码、状态、额度和个人偏好均保留。', batchTemplate: '初始权限来自：', batchLimit: '最多选择 100 个账号，可跨页选择；切换搜索或状态筛选后清空。', batchConflict: '所选账号已发生变化，本次整批未保存。草稿已保留，请重新选择成员后再设置。', batchReselect: '重新选择成员' });
     Object.assign(messages.en, { batchAccess: 'Set permissions in bulk', batchSelected: 'accounts selected', batchApply: 'Apply to selected accounts', batchClear: 'Clear selection', batchPage: 'Select accounts on this page', batchSelect: 'Select account', batchScope: 'Apply this permission group to selected accounts', batchNote: 'Only checked permission groups are replaced. Identity, role, password, status, limits and personal choices are preserved.', batchTemplate: 'Initial permissions from:', batchLimit: 'Select up to 100 accounts across pages. Changing search or status clears the selection.', batchConflict: 'A selected account changed. No accounts were saved. Your draft is retained; select the accounts again before editing.', batchReselect: 'Select accounts again' });
     Object.assign(messages.zh, { setupTitle: '完成首次设置', setupAdminStep: '首次设置 · 1 / 4：创建管理员', setupAdministrator: '管理员', setupDirectories: '成员目录', setupEntry: '访问入口', setupReview: '检查并启用', setupRoot: '成员数据目录', setupRootNote: '每位成员在此目录下获得独立空间。现有账号目录保持原位。', setupShared: '新成员的默认共享目录（可选）', setupSharedNote: '仅添加需要协作访问的目录，默认只读；也可以只使用各自的个人目录。创建成员时仍可单独调整。', setupHost: '成员登录域名或 IP', setupHostHint: '例如 team-server.local。域名解析由网络已有的 mDNS 或 DNS 提供；无法解析时使用备用 IP 入口。', setupPort: '服务固定端口', setupPortNote: '端口沿用当前 DSH 服务配置，调整端口需修改服务配置并重启。', setupSuggestedHost: '使用主机名建议', setupLink: '成员登录入口', setupFallback: '备用 IP 入口', setupModels: '可用模型组合', setupNoModels: '尚未检测到可用模型。请在 DSH 原生模型设置中配置后再发起模型对话。', setupModelsNote: '模型、工具和执行环境沿用 DSH 原生配置。', setupFinish: '完成设置并开放成员登录', setupPendingNote: '设置完成前，成员暂时不能登录使用。', setupConflict: '设置已在其他位置变更，请重新加载后继续。', setupReload: '重新加载设置' });
@@ -308,6 +314,21 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
     Object.assign(messages.zh, { contentPreviewReadOnly: '会话只读预览；文件可通过右键菜单管理。' });
     Object.assign(messages.en, { contentPreviewReadOnly: 'Read-only conversation preview. Manage files from their context menu.' });
     const styles = `
+.lanw-navigation-group{display:flex;flex-direction:column;gap:3px}.lanw-navigation-group+.lanw-navigation-group{margin-top:18px}.lanw .lanw-navigation-group-title{margin:0 12px 4px;font-size:11px;line-height:18px;font-weight:400;color:var(--dsw-alias-label-secondary)}
+.lanw-sharing-tabs{display:flex;gap:24px;flex:none;max-width:100%;overflow-x:auto;border-bottom:1px solid var(--dsw-alias-border-l1)}.lanw-sharing-tabs>.lanw-btn{flex:none;white-space:nowrap}.lanw-sharing-panel[hidden]{display:none!important}.lanw .lanw-sharing-panel>:is(.lanw-card,.lanw-inline-execution,[data-home-directory]){margin-top:0;padding-top:0;border-top:0}.lanw .lanw-sharing-panel>:is(.lanw-card,.lanw-inline-execution,[data-home-directory])>:first-child{margin-top:0}@media(max-width:600px){.lanw-sharing-tabs{gap:20px}}
+.lanw-execution-overflow[popover]{position:fixed;inset:auto;margin:0;padding:4px;border:1px solid var(--dsw-alias-border-l1);border-radius:10px;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);box-shadow:0 8px 24px color-mix(in srgb,var(--dsw-alias-label-primary) 16%,transparent)}.lanw .lanw-execution-overflow>.lanw-btn{display:block;width:100%;min-height:34px;padding:8px 10px;border:0;border-radius:6px;background:transparent;text-align:left;white-space:nowrap;font-size:12px;font-weight:400}.lanw .lanw-execution-overflow>.lanw-btn:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 5%,transparent)}
+.lanw-execution-more{position:relative}.lanw-inline-execution{display:flex;flex-direction:column;gap:16px;min-width:0}.lanw-execution-sectionbar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-width:0}.lanw .lanw-inline-execution .lanw-execution-tabs>.lanw-btn{min-height:34px;font-size:12px}
+.lanw .lanw-inline-execution .lanw-stack{gap:14px}.lanw .lanw-execution-toolbar>input[type=search]{width:auto}
+.lanw-inline-execution .lanw-execution-tabs{display:flex;flex:none;gap:20px;min-width:0;overflow-x:auto}.lanw .lanw-execution-tabs>.lanw-btn{position:relative;min-height:43px;padding:0 2px;border:0;border-radius:6px;background:transparent;box-shadow:none;color:var(--dsw-alias-label-secondary);font-size:13px;font-weight:500;transition:color .16s ease}.lanw .lanw-execution-tabs>.lanw-btn[aria-selected=true]{color:var(--dsw-alias-label-primary)}.lanw-execution-tabs>.lanw-btn[aria-selected=true]::after{position:absolute;right:0;bottom:0;left:0;height:2px;border-radius:999px;background:currentColor;content:''}.lanw-execution-panel[hidden]{display:none!important}.lanw-inline-execution .lanw-help{margin:0}.lanw-inline-execution .lanw-execution-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.lanw-execution-toolbar>input[type=search]{flex:1;min-width:180px;width:auto}.lanw-execution-toolbar>.lanw-execution-more{margin-left:auto}.lanw-execution-toolbar>input[type=search]~.lanw-execution-more{margin-left:0}.lanw-inline-execution .lanw-execution-tool{min-height:52px}.lanw-inline-execution .lanw-cli-card{padding:12px 0}.lanw-cli-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;color:var(--dsw-alias-label-secondary);font-size:12px;line-height:19px}.lanw-cli-meta .lanw-cli-path{min-width:0;overflow-wrap:anywhere}.lanw-inline-execution [data-tool-pagination]{margin-top:2px;padding-top:12px;border-top:1px solid var(--dsw-alias-border-l1)}@media(max-width:600px){.lanw-execution-toolbar>input[type=search]{flex-basis:100%}}
+.lanw .lanw-execution-tabs>.lanw-btn:hover:not(:disabled),.lanw .lanw-execution-tabs>.lanw-btn:active:not(:disabled){background:transparent;color:var(--dsw-alias-label-primary)}@media(prefers-reduced-motion:reduce){.lanw .lanw-execution-tabs>.lanw-btn{transition:none}}
+.lanw .lanw-editdialog:is(.lanw-execution-source-editor,.lanw-execution-sources-dialog)[data-edit-dialog]{height:fit-content;min-height:0}
+.lanw-execution-source-row{display:flex;align-items:center;gap:8px;min-height:64px;padding:10px 0;border-bottom:1px solid var(--dsw-alias-border-l1)}.lanw-execution-source-actions{display:flex;align-items:center;align-self:center;gap:8px;flex:none}.lanw .lanw-execution-source-actions>.lanw-btn{align-self:center}.lanw-execution-source-summary{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.lanw-execution-source-summary>strong{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lanw-execution-source-summary>.lanw-help{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lanw-execution-source-count{flex:none;font-size:12px;white-space:nowrap}.lanw .lanw-editdialog.lanw-execution-source-editor[data-edit-dialog]{width:min(600px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 48px)}.lanw .lanw-execution-source-editor .lanw-field{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:8px 0;border-bottom:0}.lanw-execution-source-editor .lanw-field input{width:100%;min-width:0}@media(max-width:560px){.lanw-execution-source-count{display:none}}
+.lanw-execution-operations>.lanw-execution-operation{padding:0}.lanw-execution-operation-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}.lanw .lanw-execution-operation-row>.lanw-btn{align-self:center;flex:none}.lanw-execution-operation-row>.lanw-check{min-width:0;overflow-wrap:anywhere}.lanw-execution-operation-details{padding:4px 0 12px 28px}
+.lanw-execution-tool{display:flex;align-items:center;gap:12px;min-height:49px;padding:8px 2px;border-bottom:1px solid var(--dsw-alias-border-l1)}.lanw-execution-tool>.lanw-btn{align-self:center}.lanw-execution-tool-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:500}.lanw-execution-tool-state{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px 10px;max-width:45%;font-size:12px;line-height:18px;color:var(--dsw-alias-label-secondary)}.lanw-execution-tool-state>span{white-space:nowrap}.lanw .lanw-editdialog:is(.lanw-execution-dialog,.lanw-execution-sources-dialog)[data-edit-dialog]{width:min(680px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 48px)}.lanw .lanw-execution-actions>.lanw-execution-source-button{margin-left:auto}.lanw .lanw-execution-sources-dialog .lanw-cli-card{padding:0 0 16px}.lanw-execution-dialog-content{min-width:0}.lanw-execution-dialog-content>p{overflow-wrap:anywhere}
+.lanw-execution-actions{position:sticky;top:0;z-index:1;background:var(--dsw-alias-bg-base);padding:8px 0}.lanw-execution-runtime>summary{color:var(--dsw-alias-label-secondary);font-size:12px}.lanw-execution-runtime>div{margin-top:12px}
+.lanw-execution-actions{flex-wrap:wrap}.lanw-execution-catalog input[type=search]{width:100%;padding:7px 10px;font:inherit;font-size:13px}.lanw-execution-catalog details>summary{cursor:pointer;font-size:13px;font-weight:500}.lanw-execution-sources>fieldset,.lanw-execution-usage>div{margin-top:16px}.lanw-execution-grants{display:flex;flex-wrap:wrap;gap:12px 24px}.lanw-execution-operation{padding:12px 0;border-top:1px solid var(--dsw-alias-border-l1)}.lanw-execution-parameters{display:grid;grid-template-columns:minmax(65px,auto) minmax(0,1fr);gap:6px 12px;margin:0;font-size:12px;line-height:19px}.lanw-execution-parameters dt{font-family:monospace;overflow-wrap:anywhere}.lanw-execution-parameters dd{margin:0;color:var(--dsw-alias-label-secondary);overflow-wrap:anywhere}.lanw-execution-usage code{display:block;white-space:normal;overflow-wrap:anywhere;font-size:12px}.lanw-execution-catalog .lanw-cli-card{padding:16px 0}
+.lanw-cli-manager .lanw-setting-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:36px}.lanw-cli-manager :is(.lanw-cli-pair,.lanw-cli-argument)>input{padding:7px 10px;font:inherit;font-size:13px}
+.lanw-cli-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.lanw-cli-card{padding:16px 0;border-bottom:1px solid var(--dsw-alias-border-l1)}.lanw-cli-summary{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;overflow-wrap:anywhere}.lanw-cli-summary code{font-size:12px;color:var(--dsw-alias-label-secondary)}.lanw-cli-path{overflow-wrap:anywhere}.lanw-cli-argument,.lanw-cli-pair{display:flex;gap:8px;min-width:0}.lanw-cli-argument>input,.lanw-cli-pair>input{flex:1;min-width:0}.lanw .lanw-cli-add-row{align-self:flex-start}.lanw-cli-advanced>summary{cursor:pointer;font-size:13px}.lanw-cli-advanced>div{margin-top:16px}.lanw-cli-manager form>.lanw-fieldset{gap:20px}.lanw-cli-manager .lanw-error{overflow-wrap:anywhere}.lanw-cli-manager textarea{resize:vertical}@media(max-width:600px){.lanw-cli-grid{grid-template-columns:minmax(0,1fr)}.lanw-cli-pair{flex-wrap:wrap}.lanw-cli-pair>input{flex-basis:calc(50% - 8px)}}
 .lanw .lanw-batch-recipients{max-height:128px;overflow:auto;padding:2px}.lanw-batch-recipients .lanw-badge{max-width:100%;overflow-wrap:anywhere;white-space:normal}.lanw-batch-selection>summary,.lanw-batch-template>summary{font-size:13px;color:var(--dsw-alias-label-secondary)}
 .lanw.lanw-setup-shell{height:100%;max-height:100%;min-height:0;padding:0;overflow:hidden;align-items:stretch}.lanw-setup-shell .lanw-setup-guide{display:flex;flex:1;min-height:0;height:100%;max-height:100%}.lanw-setup-guide form{display:flex;flex:1;min-height:0}.lanw-setup-guide form>.lanw-fieldset{display:flex;flex:1;min-height:0;flex-direction:column;gap:0}.lanw-setup-guide [data-setup-step]{flex:1;min-height:0;overflow:auto;padding:8px 2px 16px}.lanw-setup-guide .lanw-setup-actions{flex:none;position:sticky;bottom:0;background:var(--dsw-alias-bg-base);border-top:1px solid var(--dsw-alias-border-l1);padding-top:16px}.lanw-directory-recommendation{display:flex;flex-wrap:wrap;align-items:center;gap:8px;overflow-wrap:anywhere}
 .lanw-first-steps{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0;margin:0 0 20px}.lanw-first-steps li{padding:8px 0;border-bottom:2px solid var(--dsw-alias-border-l1);font-size:12px;min-width:0}.lanw-first-steps li[aria-current=step]{border-color:var(--dsw-alias-brand-primary);color:var(--dsw-alias-label-primary)}@media(max-width:620px){.lanw-first-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -539,7 +560,7 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
           branding: IconPersonalizationOutlineRegular, usage: IconGaugeOutlineRegular, capabilities: IconSparkleRegular,
           limits: IconGaugeOutlineRegular, directories: IconFolderOpenOutlineRegular, status: IconCheckCircleOutlineRegular,
           security: IconShieldOutlineRegular, features: IconSlidersTwoOutlineRegular, skills: IconSkillOutlineRegular,
-          mcpServers: IconApiOutlineRegular, agentPresets: IconAgentPresetOutlineRegular, plugins: IconPluginPinwheelOutlineRegular,
+          mcpServers: IconApiOutlineRegular, cliTools: IconApiOutlineRegular, agentPresets: IconAgentPresetOutlineRegular, plugins: IconPluginPinwheelOutlineRegular,
           permissionPresets: IconShieldOutlineRegular, sessions: IconNewChatOutlineRegular, files: IconFolderOpenOutlineRegular,
         };
         function NavigationLabel({ id, children }) {
@@ -565,7 +586,466 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
             name && h('input', { type: 'checkbox', name, checked, disabled, onChange, hidden: true, 'aria-hidden': true, tabIndex: -1 }),
             h(Switch, { label, checked, disabled, onChange: next => onChange({ target: { checked: next } }) }));
         }
-        const capabilitySections = [['features', 'personalFunctions'], ['skills', 'accessSkills'], ['mcpServers', 'accessMcp'], ['agentPresets', 'accessAgents'], ['plugins', 'accessPlugins'], ['permissionPresets', 'accessPermissions']];
+        Object.assign(messages.zh, { accessCliTools: 'CLI 工具', cliAccess: 'CLI 使用权限', inheritCli: '使用已开放的 CLI', customCli: '仅允许所选 CLI', cliNote: '成员可在终端和命令中直接运行所选 CLI。命令与凭据由管理员配置。', cliEmpty: '尚未配置 CLI。管理员可在插件设置中的“成员 CLI 工具”添加命令。' });
+        Object.assign(messages.en, { accessCliTools: 'CLI tools', cliAccess: 'CLI access', inheritCli: 'Use available CLIs', customCli: 'Only selected CLIs', cliNote: 'Members can run selected CLIs in commands and terminals. Administrators configure commands and credentials.', cliEmpty: 'No CLIs configured. Add commands in the Member CLI Tools plugin settings.' });
+        Object.assign(messages.zh, {
+          cliToolsDescription: '配置服务器上的命令，再通过账号授权分配给成员。',
+          cliSetupNote: '先在服务器安装程序，再添加命令。这里管理命令入口，不安装或删除程序文件。',
+          cliSaveNote: '保存变更会关闭成员当前的执行资源；重新打开会话后使用新配置。',
+          cliAdd: '指定工具', cliCommandName: '命令名称', cliDisplayName: '显示名称', cliProgram: '可执行程序',
+          cliTarget: '工具名称或可执行路径', cliInspect: '识别工具', cliConfigureManually: '手动填写', cliTargetNote: '例如 rg、python3 或绝对路径。只读取指定程序的元数据，不运行程序；参数在下方填写。', cliInspected: '已识别指定工具，配置已预填。请确认运行依赖与开放范围，保存后生效。',
+          cliProgramNote: '服务器上的绝对路径，例如 /usr/bin/python3。', cliArguments: '固定参数', cliArgument: '参数', cliAddArgument: '添加参数',
+          cliPaths: '只读依赖路径', cliPathsNote: '每行一个绝对路径，只开放程序运行所需的文件或目录。',
+          cliAdvanced: '环境变量与凭据', cliEnvironment: '环境变量', cliCredentials: '凭据引用',
+          cliCredentialNote: '填写 DSH 凭据服务中的引用名称，不在此填写密钥。授权成员运行 CLI 时可读取所提供的凭据。',
+          cliVariable: '变量名称', cliValue: '变量值', cliReference: '凭据引用名称', cliAddVariable: '添加变量', cliAddCredential: '添加引用',
+          cliRemove: '移除', cliRemoveConfirm: '移除此命令入口？程序文件会保留。', cliConfirmRemove: '确认移除',
+          cliSaved: '配置已保存。可到「成员管理 → 账号授权 → 能力权限 → CLI 工具」分配使用权限。',
+          cliNoTools: '还没有 CLI 工具，添加服务器上已安装的命令即可开始。', cliEnabled: '开放此命令', cliDisabled: '已停用',
+          cliDuplicateVariable: '变量名称不能为空或重复。', toolNames: '工具权限',
+          cliEmpty: '尚未配置 CLI。管理员可在「多用户服务 → 共享环境 → 执行工具」添加命令。',
+        });
+        Object.assign(messages.en, {
+          cliToolsDescription: 'Register server commands, then grant members access.',
+          cliSetupNote: 'Install the program on the server first. This page manages command registrations, not program files.',
+          cliSaveNote: 'Saving changes closes members’ current execution resources. Reopen sessions to use the new configuration.',
+          cliAdd: 'Specify tool', cliCommandName: 'Command name', cliDisplayName: 'Display name', cliProgram: 'Executable path',
+          cliTarget: 'Tool name or executable path', cliInspect: 'Identify tool', cliConfigureManually: 'Enter manually', cliTargetNote: 'For example rg, python3 or an absolute path. Only the selected program metadata is read; the program is not run. Add arguments below.', cliInspected: 'The selected tool was identified and the configuration prefilled. Review its dependencies and access before saving.',
+          cliProgramNote: 'An absolute server path, such as /usr/bin/python3.', cliArguments: 'Fixed arguments', cliArgument: 'Argument', cliAddArgument: 'Add argument',
+          cliPaths: 'Read-only dependencies', cliPathsNote: 'One absolute path per line. Include only files or directories needed by this program.',
+          cliAdvanced: 'Environment and credentials', cliEnvironment: 'Environment variables', cliCredentials: 'Credential references',
+          cliCredentialNote: 'Use reference names from the DSH credential service, not secret values. Authorized members can read credentials supplied to their CLI.',
+          cliVariable: 'Variable name', cliValue: 'Value', cliReference: 'Credential reference', cliAddVariable: 'Add variable', cliAddCredential: 'Add reference',
+          cliRemove: 'Remove', cliRemoveConfirm: 'Remove this command registration? Program files will be kept.', cliConfirmRemove: 'Confirm removal',
+          cliSaved: 'Configuration saved. Grant access in Member accounts → Account access → Capabilities → CLI tools.',
+          cliNoTools: 'No CLI tools yet. Add a command already installed on the server.', cliEnabled: 'Make this command available', cliDisabled: 'Disabled',
+          cliDuplicateVariable: 'Variable names must be nonempty and unique.', toolNames: 'Tool permissions',
+          cliEmpty: 'No CLIs configured. Administrators can add commands in Multi-user service → Shared environment → Execution tools.',
+        });
+        Object.assign(messages.zh, {
+          executionToolCatalog: '执行工具', cliToolsDescription: '管理指定工具，以及已登记来源中的 tool-runner 工具。',
+          executionIntro: 'Skill 由用户自己管理。这里按工具及操作授权，不需要等待执行失败，也不修改 Skill。',
+          executionScan: '扫描工具', executionSave: '保存白名单', executionExport: '导出配置', executionImport: '导入配置文件', executionImportSave: '保存导入配置',
+          executionSources: '扫描来源', executionSourceId: '来源名称', executionSourceRoot: 'tool-runner 安装目录', executionSourceCommand: 'tool-runner 可执行程序', executionSourceAdd: '添加来源',
+          executionHarness: '供 Harness 使用', executionShared: '共享给成员', executionSharedNote: '共享后仍需通过成员账号的执行工具权限控制。',
+          executionUsage: '操作与用法', executionViewUsage: '用法', executionOperation: '操作', executionParameters: '参数', executionRequired: '必填',
+          executionStale: '工具已更新，请重新勾选确认授权。', executionMissing: '未扫描到的授权项', executionMissingNote: '请检查扫描来源，或移除失效授权。',
+          executionSaved: '工具白名单已保存。', executionEmpty: '点击扫描查看已安装工具；没有可用来源时，可添加 tool-runner 安装目录。',
+          executionSourceEmpty: '未发现 tool-runner 安装，请添加扫描来源。', executionSearch: '搜索工具、用途或操作',
+          executionConfigError: '请选择有效的 dsh-execution-tools JSON 配置文件（最大 128 KiB）。', executionImportReady: '配置已读取，保存后生效。',
+          executionManual: '指定工具与导入配置', executionManualNote: '指定一个命令名称或可执行路径来预填配置，也可手动填写或导入通用配置文件。',
+          executionRetireNote: '保存变更会关闭成员当前执行资源，重新打开会话后生效。', executionUnused: '尚未授权', executionUnavailable: '源工具已停用',
+          executionSkill: '关联 Skill', executionNoSkillCopy: '仅查看关联，不会复制或改写用户 Skill。',
+          executionNeedsReview: '待确认',
+          executionManage: '管理',
+          executionSaveSources: '保存并扫描', executionSourceChangeNote: '修改或移除来源后，需要重新确认该来源下的工具授权。',
+          executionSourceSearch: '搜索来源名称或路径', executionSourceDuplicate: '来源名称已存在，请使用其他名称。',
+          executionSourceApplyAdd: '检测并添加到列表', executionSourceApplyEdit: '检测并应用修改', executionSourceToolCount: '个工具',
+          executionSourceStaged: '来源已更新到列表，保存并扫描后生效。',
+        });
+        Object.assign(messages.en, {
+          executionToolCatalog: 'Execution tools', cliToolsDescription: 'Manage specified commands and tools from registered tool-runner sources.',
+          executionIntro: 'Skills remain user-managed. Grant tools and operations here before use, without changing Skills.',
+          executionScan: 'Scan tools', executionSave: 'Save whitelist', executionExport: 'Export configuration', executionImport: 'Import configuration', executionImportSave: 'Save imported configuration',
+          executionSources: 'Discovery sources', executionSourceId: 'Source name', executionSourceRoot: 'tool-runner installation directory', executionSourceCommand: 'tool-runner executable', executionSourceAdd: 'Add source',
+          executionHarness: 'Available to Harness', executionShared: 'Share with members', executionSharedNote: 'Shared tools remain subject to individual member execution-tool permissions.',
+          executionUsage: 'Operations and usage', executionViewUsage: 'Usage', executionOperation: 'Operation', executionParameters: 'Parameters', executionRequired: 'required',
+          executionStale: 'The tool changed. Select access again to approve the current version.', executionMissing: 'Grants not found in this scan', executionMissingNote: 'Check discovery sources or remove obsolete grants.',
+          executionSaved: 'Tool whitelist saved.', executionEmpty: 'Scan to inspect installed tools. Add a tool-runner installation if none is available.',
+          executionSourceEmpty: 'No tool-runner installation found. Add a discovery source.', executionSearch: 'Search tools, descriptions or operations',
+          executionConfigError: 'Choose a valid dsh-execution-tools JSON configuration, no larger than 128 KiB.', executionImportReady: 'Configuration loaded. Save to apply it.',
+          executionManual: 'Specified tools and configuration import', executionManualNote: 'Specify one command name or executable path to prefill its configuration, enter it manually, or import a shared configuration file.',
+          executionRetireNote: 'Saving changes closes members’ current execution resources. Reopen sessions to apply the configuration.', executionUnused: 'Not authorized', executionUnavailable: 'Disabled at source',
+          executionSkill: 'Associated Skill', executionNoSkillCopy: 'The association is informational. User Skills are not copied or modified.',
+          executionNeedsReview: 'Needs review',
+          executionManage: 'Manage',
+          executionSaveSources: 'Save and scan', executionSourceChangeNote: 'Changing or removing a source requires its tool permissions to be confirmed again.',
+          executionSourceSearch: 'Search source names or paths', executionSourceDuplicate: 'This source name already exists. Choose another name.',
+          executionSourceApplyAdd: 'Check and add to list', executionSourceApplyEdit: 'Check and apply changes', executionSourceToolCount: 'tools',
+          executionSourceStaged: 'Source updated in the list. Save and scan to apply it.',
+        });
+        function downloadExecutionConfiguration(value) {
+          const blob = new Blob([JSON.stringify({ format: 'dsh-execution-tools', version: 1, tools: value.tools, executionTools: value.executionTools })], { type: 'application/json' });
+          const url = URL.createObjectURL(blob), link = document.createElement('a');
+          link.href = url; link.download = 'dsh-execution-tools.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+        function ExecutionToolsManager({ request, onSaved, disabled }) {
+          const [saved, setSaved] = React.useState(null), [draft, setDraft] = React.useState(null), [inventory, setInventory] = React.useState(null);
+          const [page, setPage] = React.useState(0), [size, setSize] = React.useState(5);
+          const [managedTool, setManagedTool] = React.useState(null), manageOpener = React.useRef(null);
+          const [manageSources, setManageSources] = React.useState(false), sourcesOpener = React.useRef(null);
+          const [busy, setBusy] = React.useState(false), [problem, setProblem] = React.useState(''), [notice, setNotice] = React.useState(''), [search, setSearch] = React.useState('');
+          const blocked = disabled || busy;
+          const dirty = !!saved && JSON.stringify(draft) !== JSON.stringify(saved.executionTools);
+          async function scan(value) {
+            return request('admin.cliTools', { operation: 'scan', sources: value.sources });
+          }
+          async function load() {
+            setBusy(true); setProblem(''); setNotice('');
+            try {
+              const value = await request('admin.cliTools', { operation: 'read' });
+              const next = { ...value.executionTools, sources: value.executionTools.sources.length ? value.executionTools.sources : value.suggestedSources };
+              setSaved(value); setDraft(next); setInventory(await scan(next)); setPage(0);
+            } catch (error) { setProblem(error.message); }
+            finally { setBusy(false); }
+          }
+          React.useEffect(() => { load(); }, []);
+          const change = next => { setDraft(next); setProblem(''); setNotice(''); };
+          function openManager(tool, opener) {
+            const existing = draft.grants.find(row => row.id === tool.id);
+            const current = existing?.fingerprint === tool.fingerprint;
+            const grant = { id: tool.id, fingerprint: tool.fingerprint, operations: current ? [...existing.operations] : tool.operations.filter(row => row.enabled).map(row => row.id), harness: current && existing.harness, shared: current && existing.shared };
+            manageOpener.current = opener; setProblem(''); setManagedTool({ tool, grant, stale: !!existing && !current });
+          }
+          async function refreshScan() {
+            setBusy(true); setProblem(''); setNotice('');
+            try { setInventory(await scan(draft)); setPage(0); } catch (error) { setProblem(error.message); } finally { setBusy(false); }
+          }
+          async function save(configuration) {
+            setBusy(true); setProblem(''); setNotice('');
+            try {
+              const value = await request('admin.cliTools', { operation: 'save', expectedRevision: saved.revision, executionTools: configuration });
+              setSaved(value); setDraft(value.executionTools); setNotice(t('executionSaved'));
+              try { setInventory(await scan(value.executionTools)); await onSaved(); } catch (error) { setProblem(error.message); }
+              return true;
+            } catch (error) { setProblem(error.message); return false; } finally { setBusy(false); }
+          }
+          async function saveSources(configuration) {
+            setBusy(true); setProblem('');
+            try {
+              const inventory = await scan(configuration), failed = inventory.errors.find(row => !row.tool);
+              if (failed) { setProblem(`${failed.sourceId}: ${failed.message}`); return; }
+              if (await save(configuration)) setManageSources(false);
+            } catch (error) { setProblem(error.message); } finally { setBusy(false); }
+          }
+          const tools = (inventory?.tools ?? []).filter(tool => `${tool.id} ${tool.description} ${tool.skill} ${tool.operations.map(row => `${row.id} ${row.description}`).join(' ')}`.toLowerCase().includes(search.toLowerCase()));
+          const missing = (draft?.grants ?? []).filter(row => !inventory?.tools.some(tool => tool.id === row.id) && row.id.toLowerCase().includes(search.toLowerCase()));
+          const rows = [...tools, ...missing.map(row => ({ id: row.id, missing: row }))];
+          const pages = Math.max(1, Math.ceil(rows.length / size)), current = Math.min(page, pages - 1);
+          React.useEffect(() => { setPage(previous => Math.min(previous, pages - 1)); }, [pages]);
+          return h('div', { className: 'lanw-stack lanw-execution-catalog', 'data-execution-catalog': true, 'aria-busy': busy },
+            problem && h('p', { className: 'lanw-error', role: 'alert' }, problem), notice && h('p', { className: 'lanw-help', role: 'status' }, notice),
+            !draft ? h('p', { className: 'lanw-help' }, t('loading')) : h(React.Fragment, null,
+              h('div', { className: 'lanw-execution-toolbar' },
+                h('input', { type: 'search', 'aria-label': t('executionSearch'), placeholder: t('executionSearch'), value: search, onChange: event => { setSearch(event.target.value); setPage(0); } }),
+                h(Button, { primary: !dirty, disabled: blocked, onClick: refreshScan }, t('executionScan')),
+                h(Button, { disabled: blocked, 'aria-haspopup': 'dialog', 'data-manage-execution-sources': true, onClick: event => { sourcesOpener.current = event.currentTarget; setProblem(''); setManageSources(true); } }, t('executionSources')),
+                dirty && h(Button, { primary: true, disabled: blocked, onClick: () => save(draft) }, t('executionSave')),
+                h(ExecutionMore, { disabled: blocked, onExport: () => downloadExecutionConfiguration({ ...saved, executionTools: draft }), onReload: load })),
+              (inventory?.errors ?? []).map((error, index) => h('p', { className: 'lanw-error', role: 'status', key: index }, `${error.sourceId}${error.tool ? '/' + error.tool : ''}: ${error.message}`)),
+              !rows.length && h('p', { className: 'lanw-empty' }, t(search ? 'noMatches' : 'executionEmpty')),
+              h('div', { className: 'lanw-execution-tool-list' }, rows.slice(current * size, (current + 1) * size).map(tool => {
+                if (tool.missing) return h('div', { className: 'lanw-cli-card', key: tool.id, 'data-execution-tool': tool.id }, h('p', null, `${t('executionMissing')}: ${tool.id}`), h('p', { className: 'lanw-help' }, t('executionMissingNote')),
+                  h(Button, { disabled: blocked, onClick: () => change({ ...draft, grants: draft.grants.filter(grant => grant.id !== tool.id) }) }, t('cliRemove')));
+                const row = draft.grants.find(row => row.id === tool.id), current = row?.fingerprint === tool.fingerprint;
+                return h('div', { className: 'lanw-execution-tool', key: tool.id, 'data-execution-tool': tool.id },
+                  h('span', { className: 'lanw-execution-tool-name' }, tool.label),
+                  h('span', { className: 'lanw-execution-tool-state' },
+                    !tool.enabled ? t('executionUnavailable') : row && !current ? t('executionNeedsReview') : current && (row.harness || row.shared)
+                      ? [row.harness && h('span', { key: 'harness' }, t('executionHarness')), row.shared && h('span', { key: 'shared' }, t('executionShared'))]
+                      : t('executionUnused')),
+                  h(Button, { disabled: blocked, 'aria-label': `${t('executionManage')} ${tool.label}`, 'aria-haspopup': 'dialog', 'data-manage-execution-tool': tool.id, onClick: event => openManager(tool, event.currentTarget) }, t('executionManage')));
+              })),
+              h(ToolPagination, { kind: 'scanned', total: rows.length, page: current, pages, size, disabled: blocked, setPage, setSize: value => { setSize(value); setPage(0); } }),
+              managedTool && h(ExecutionToolDialog, { key: managedTool.tool.id, ...managedTool, pending: blocked, problem, returnFocusTo: manageOpener.current, onDraftChange: () => setProblem(''),
+                onClose: () => { setManagedTool(null); setProblem(''); },
+                onSave: async grant => { if (await save({ ...draft, grants: [...draft.grants.filter(row => row.id !== grant.id), grant] })) setManagedTool(null); },
+              }),
+              manageSources && h(ExecutionSourceDialog, { configuration: draft, inventory, inspectSource: source => scan({ sources: [source] }), saveAvailable: dirty, pending: blocked, problem, returnFocusTo: sourcesOpener.current, onDraftChange: () => setProblem(''),
+                onClose: () => { setManageSources(false); setProblem(''); }, onSave: saveSources,
+              })));
+        }
+        function ExecutionSourceDialog({ configuration, inventory, inspectSource, saveAvailable, pending, problem, returnFocusTo, onClose, onSave, onDraftChange }) {
+          const [draft, setDraft] = React.useState(() => ({ ...configuration, sources: configuration.sources.map(source => ({ ...source })), grants: [...configuration.grants] }));
+          const [query, setQuery] = React.useState(''), [editor, setEditor] = React.useState(null), [revision, setRevision] = React.useState(0), [notice, setNotice] = React.useState('');
+          const [counts, setCounts] = React.useState(() => Object.fromEntries(configuration.sources.map(source => [source.id, (inventory?.tools ?? []).filter(tool => tool.sourceId === source.id).length])));
+          const editorOpener = React.useRef(null), dirty = JSON.stringify(draft) !== JSON.stringify(configuration);
+          function openEditor(index, opener) {
+            let source = draft.sources[index];
+            if (!source) {
+              let next = 1; while (draft.sources.some(source => source.id === `runner-${next}`)) next++;
+              source = { id: `runner-${next}`, kind: 'tool-runner', root: '', command: '' };
+            }
+            editorOpener.current = opener; setEditor({ index, source }); onDraftChange();
+          }
+          function applySource(source, count) {
+            const sources = [...draft.sources];
+            if (editor.index < 0) sources.push(source); else sources[editor.index] = source;
+            setDraft(previous => ({ ...previous, sources })); setCounts(previous => ({ ...previous, [source.id]: count }));
+            setRevision(previous => previous + 1); setNotice(t('executionSourceStaged')); setQuery(previous => previous.trim() ? source.id : ''); setEditor(null); onDraftChange();
+          }
+          function removeSource(index) {
+            setDraft(previous => ({ ...previous, sources: previous.sources.filter((_, i) => i !== index) }));
+            setRevision(previous => previous + 1); setNotice(''); onDraftChange();
+          }
+          function submit() {
+            if (pending) return;
+            const changed = configuration.sources.filter(source => !draft.sources.some(row => row.id === source.id && row.kind === source.kind && row.root === source.root && row.command === source.command));
+            onSave({ ...draft, grants: draft.grants.filter(row => !changed.some(source => row.id.startsWith(source.id + '/'))) });
+          }
+          const sources = draft.sources.map((source, index) => ({ source, index })).filter(({ source }) => `${source.id} ${source.root} ${source.command}`.toLowerCase().includes(query.toLowerCase()));
+          return h(EditDialog, { title: t('executionSources'), className: 'lanw-execution-sources-dialog', editorKind: 'execution-sources', pending, onClose, returnFocusTo, draftRevision: revision,
+            footer: h(Button, { primary: true, disabled: pending || !dirty && !saveAvailable, onClick: submit }, t('executionSaveSources')) },
+            h('div', { className: 'lanw-stack', 'data-execution-sources-dialog': true },
+              problem && h('p', { className: 'lanw-error', role: 'alert' }, problem),
+              h('p', { className: 'lanw-help' }, t('executionSourceChangeNote')), notice && h('p', { className: 'lanw-help', role: 'status' }, notice),
+              h('div', { className: 'lanw-row' }, h('span', { className: 'lanw-help lanw-cli-summary' }, `${draft.sources.length} / 16`),
+                h(Button, { disabled: pending || draft.sources.length >= 16, 'aria-haspopup': 'dialog', 'data-add-execution-source': true, onClick: event => openEditor(-1, event.currentTarget) }, t('executionSourceAdd'))),
+              h('input', { type: 'search', 'data-edit-filter': true, 'aria-label': t('executionSourceSearch'), placeholder: t('executionSourceSearch'), value: query, disabled: pending, onChange: event => setQuery(event.target.value) }),
+              !draft.sources.length && h('p', { className: 'lanw-empty' }, t('executionSourceEmpty')),
+              draft.sources.length > 0 && !sources.length && h('p', { className: 'lanw-empty' }, t('noMatches')),
+              h('div', { className: 'lanw-execution-source-list' }, sources.map(({ source, index }) => h('div', { className: 'lanw-execution-source-row', key: index, 'data-execution-source': source.id },
+                h('div', { className: 'lanw-execution-source-summary' }, h('strong', null, source.id), h('span', { className: 'lanw-help' }, source.root)),
+                h('div', { className: 'lanw-execution-source-actions' },
+                  h('span', { className: 'lanw-help lanw-execution-source-count' }, `${counts[source.id] ?? 0} ${t('executionSourceToolCount')}`),
+                  h(Button, { disabled: pending, 'aria-haspopup': 'dialog', 'aria-label': `${t('executionManage')} ${source.id}`, onClick: event => openEditor(index, event.currentTarget) }, t('executionManage')),
+                  h(Button, { disabled: pending, 'aria-label': `${t('cliRemove')} ${source.id}`, onClick: () => removeSource(index) }, t('cliRemove')))))),
+              h('p', { className: 'lanw-help' }, t('executionRetireNote')),
+              editor && h(ExecutionSourceEditor, { key: editor.index, source: editor.source, creating: editor.index < 0, sources: draft.sources, index: editor.index,
+                pending, inspectSource, returnFocusTo: editorOpener.current, onClose: () => setEditor(null), onApply: applySource })));
+        }
+        function ExecutionSourceEditor({ source, creating, sources, index, pending, inspectSource, returnFocusTo, onClose, onApply }) {
+          const [draft, setDraft] = React.useState(() => ({ ...source })), [busy, setBusy] = React.useState(false), [problem, setProblem] = React.useState('');
+          const blocked = pending || busy, dirty = JSON.stringify(draft) !== JSON.stringify(source);
+          const change = fields => { setDraft(previous => ({ ...previous, ...fields })); setProblem(''); };
+          async function submit(event) {
+            event.preventDefault(); if (blocked) return;
+            if (sources.some((row, i) => i !== index && row.id === draft.id)) { setProblem(t('executionSourceDuplicate')); return; }
+            setBusy(true); setProblem('');
+            try {
+              const inventory = await inspectSource(draft), failed = inventory.errors.find(row => !row.tool);
+              if (failed) { setProblem(`${failed.sourceId}: ${failed.message}`); return; }
+              onApply(draft, inventory.tools.length);
+            } catch (error) { setProblem(error.message); } finally { setBusy(false); }
+          }
+          return h(EditDialog, { title: creating ? t('executionSourceAdd') : `${t('executionManage')} · ${source.id}`, className: 'lanw-execution-source-editor', editorKind: 'execution-source',
+            pending: blocked, onClose, returnFocusTo, footer: h(Button, { primary: true, type: 'submit', form: 'lanw-execution-source-form', disabled: blocked || !creating && !dirty }, t(creating ? 'executionSourceApplyAdd' : 'executionSourceApplyEdit')) },
+            h('form', { id: 'lanw-execution-source-form', className: 'lanw-stack', 'data-execution-source-editor': true, onSubmit: submit },
+              problem && h('p', { className: 'lanw-error', role: 'alert' }, problem),
+              h('fieldset', { className: 'lanw-fieldset lanw-stack', disabled: blocked },
+                h(Field, { label: t('executionSourceId'), value: draft.id, required: true, maxLength: 64, pattern: '[A-Za-z0-9][A-Za-z0-9._-]{0,63}', onChange: event => change({ id: event.target.value }) }),
+                h(Field, { label: t('executionSourceRoot'), value: draft.root, required: true, onChange: event => change({ root: event.target.value }) }),
+                h(Field, { label: t('executionSourceCommand'), value: draft.command, required: true, onChange: event => change({ command: event.target.value }) }))));
+        }
+        function ExecutionToolDialog({ tool, grant, stale, pending, problem, returnFocusTo, onClose, onSave, onDraftChange }) {
+          const [draft, setDraft] = React.useState(grant);
+          const [expandedOperation, setExpandedOperation] = React.useState(null);
+          const dirty = JSON.stringify(draft) !== JSON.stringify(grant);
+          const change = fields => { setDraft(previous => ({ ...previous, ...fields })); onDraftChange(); };
+          const operations = tool.operations.map(operation => {
+            const expanded = expandedOperation === operation.id, detailsId = `lanw-operation-${encodeURIComponent(tool.id + '/' + operation.id)}`;
+            const parameters = Object.entries(operation.parameters).map(([key, parameter]) => h(React.Fragment, { key },
+              h('dt', null, key), h('dd', null, `${parameter.type}${parameter.required ? ' · ' + t('executionRequired') : ''}${parameter.description ? ' · ' + parameter.description : ''}${parameter.values ? ' · ' + parameter.values.join(', ') : ''}`)));
+            return h('div', { className: 'lanw-execution-operation', key: operation.id },
+              h('div', { className: 'lanw-execution-operation-row' },
+                h(Check, { label: operation.id, checked: draft.operations.includes(operation.id), disabled: pending || !tool.enabled || !operation.enabled,
+                  onChange: event => change({ operations: event.target.checked ? [...draft.operations, operation.id] : draft.operations.filter(id => id !== operation.id) }) }),
+                h(Button, { 'aria-expanded': expanded, 'aria-controls': detailsId, 'aria-label': `${operation.id} · ${t('executionViewUsage')}`, onClick: () => setExpandedOperation(expanded ? null : operation.id) }, t('executionViewUsage'))),
+              expanded && h('div', { id: detailsId, className: 'lanw-execution-operation-details lanw-stack' },
+                h('p', { className: 'lanw-help' }, operation.description), parameters.length > 0 && h('dl', { className: 'lanw-execution-parameters' }, parameters)));
+          });
+          const usage = h('details', { className: 'lanw-execution-usage' }, h('summary', null, `${t('executionUsage')} · ${tool.operations.length}`),
+            h('div', { className: 'lanw-stack' }, h('code', { className: 'lanw-cli-path' }, tool.usage),
+              h('details', { className: 'lanw-execution-runtime' }, h('summary', null, `${t('cliPaths')} · ${tool.readOnlyPaths?.length ?? 0}`),
+                h('div', { className: 'lanw-stack' }, ...(tool.readOnlyPaths ?? []).map(path => h('code', { className: 'lanw-cli-path', key: path }, path)))),
+              tool.skill && h('p', { className: 'lanw-help' }, `${t('executionSkill')}: ${tool.skill} · ${t('executionNoSkillCopy')}`), h('div', { className: 'lanw-execution-operations' }, operations)));
+          return h(EditDialog, { title: `${t('executionManage')} · ${tool.label}`, subtitle: `${t('executionSources')}: ${tool.sourceId}`, className: 'lanw-execution-dialog', editorKind: 'execution-tool',
+            pending, onClose, returnFocusTo, footer: h(Button, { primary: true, disabled: pending || !dirty, onClick: () => onSave(draft) }, t('executionSave')) },
+            h('div', { className: 'lanw-execution-dialog-content lanw-stack', 'data-execution-tool-dialog': tool.id },
+              problem && h('p', { className: 'lanw-error', role: 'alert' }, problem),
+              h('p', { className: 'lanw-help' }, tool.description), stale && h('p', { className: 'lanw-error' }, t('executionStale')),
+              h('div', { className: 'lanw-execution-grants' },
+                h(Check, { label: t('executionHarness'), checked: draft.harness, disabled: pending || !tool.enabled, onChange: event => change({ harness: event.target.checked }) }),
+                h(Check, { label: t('executionShared'), checked: draft.shared, disabled: pending || !tool.enabled || !!tool.sharingIssue, onChange: event => change({ shared: event.target.checked }) })),
+              tool.sharingIssue && h('p', { className: 'lanw-help' }, tool.sharingIssue), !tool.sharingIssue && tool.sharingNote && h('p', { className: 'lanw-help' }, tool.sharingNote), usage,
+              h('p', { className: 'lanw-help' }, t('executionSharedNote')), h('p', { className: 'lanw-help' }, t('executionRetireNote'))));
+        }
+        function SharedExecutionTools({ active, ...props }) {
+          const [loaded, setLoaded] = React.useState(active);
+          const [tab, setTab] = React.useState('manual');
+          const tabs = [['manual', 'executionManualTab'], ['scanned', 'executionScannedTab']];
+          React.useEffect(() => { if (active) setLoaded(true); }, [active]);
+          if (!loaded) return null;
+          const notes = tab === 'manual' ? ['executionManualHint', 'executionIntro', 'executionSharedNote', 'executionRetireNote'] : ['executionScannedHint', 'executionIntro', 'executionSharedNote', 'executionRetireNote'];
+          return h('section', { className: 'lanw-inline-execution', 'data-shared-execution-tools': true, 'aria-label': t('executionToolCatalog') },
+            h('div', { className: 'lanw-execution-sectionbar' },
+              h('div', { className: 'lanw-execution-tabs', role: 'tablist', 'aria-label': t('executionToolCatalog'), onKeyDown: event => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                event.preventDefault(); const next = event.key === 'Home' ? 'manual' : event.key === 'End' ? 'scanned' : tab === 'manual' ? 'scanned' : 'manual';
+                setTab(next); event.currentTarget.querySelector(`[data-execution-tab="${next}"]`)?.focus();
+              } }, tabs.map(([id, label]) => h(Button, { key: id, id: `lanw-execution-tab-${id}`, role: 'tab', 'data-execution-tab': id, 'aria-selected': tab === id, 'aria-controls': `lanw-execution-panel-${id}`, tabIndex: tab === id ? 0 : -1, onClick: () => setTab(id) }, t(label)))),
+              h(Tooltip, { label: h('span', { style: { whiteSpace: 'pre-line' } }, notes.map(key => t(key)).join('\n\n')), side: 'bottom', align: 'end', delayMs: 80, focusDelayMs: 0, maxWidth: 360, openOnClick: true },
+                h('button', { type: 'button', className: 'lanw-btn lanw-iconbutton', 'data-execution-help': tab, 'aria-label': `${t(tab === 'manual' ? 'executionManualTab' : 'executionScannedTab')} · ${t('executionNotes')}` }, h(IconInfoOutlineRegular, { size: 16, 'aria-hidden': true, focusable: false })))),
+            tabs.map(([id]) => h('section', { key: id, id: `lanw-execution-panel-${id}`, className: 'lanw-execution-panel', role: 'tabpanel', 'aria-labelledby': `lanw-execution-tab-${id}`, hidden: tab !== id }, id === 'manual' ? h(ManualExecutionTools, props) : h(ExecutionToolsManager, props))));
+        }
+        function ManualExecutionTools(props) {
+          return h('section', { 'data-manual-execution-tools': true }, h(CliToolsManager, props));
+        }
+        function ExecutionMore({ disabled, onExport, onReload }) {
+          const [open, setOpen] = React.useState(false), opener = React.useRef(null), menu = React.useRef(null), last = React.useRef(false);
+          const id = React.useId();
+          const items = [{ id: 'export', label: t('executionExport'), disabled }, { id: 'reload', label: t('reloadSharing'), disabled }];
+          React.useEffect(() => {
+            const node = menu.current;
+            const position = event => {
+              if (event.newState !== 'open' || !opener.current) return;
+              const rect = opener.current.getBoundingClientRect(), width = Math.min(240, window.innerWidth - 24);
+              node.style.width = `${width}px`; node.style.left = `${Math.max(12, Math.min(rect.right - width, window.innerWidth - width - 12))}px`;
+              node.style.top = `${rect.bottom + 84 < window.innerHeight ? rect.bottom + 6 : Math.max(12, rect.top - 84)}px`;
+            };
+            const toggle = event => {
+              const shown = event.newState === 'open'; setOpen(shown);
+              if (shown) { const buttons = node.querySelectorAll('button:not(:disabled)'); buttons[last.current ? buttons.length - 1 : 0]?.focus(); last.current = false; }
+            };
+            node.addEventListener('beforetoggle', position); node.addEventListener('toggle', toggle);
+            return () => { node.removeEventListener('beforetoggle', position); node.removeEventListener('toggle', toggle); };
+          }, []);
+          return h('span', { className: 'lanw-execution-more' },
+            h(Button, { disabled, popovertarget: id, 'aria-haspopup': 'menu', 'aria-expanded': open, onClick: event => { opener.current = event.currentTarget; }, onKeyDown: event => {
+              if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
+              event.preventDefault(); last.current = event.key === 'ArrowUp'; event.currentTarget.click();
+            } }, t('executionMore')),
+            h('div', { ref: menu, id, popover: 'auto', role: 'menu', className: 'lanw-execution-overflow', onKeyDown: event => {
+              if (isDismissKey(event)) { event.preventDefault(); event.stopPropagation(); menu.current.hidePopover(); opener.current?.focus({ preventScroll: true }); return; }
+              if (event.key === 'Tab') { menu.current.hidePopover(); return; }
+              if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+              event.preventDefault(); const buttons = [...menu.current.querySelectorAll('button:not(:disabled)')], index = buttons.indexOf(document.activeElement);
+              buttons[event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length]?.focus();
+            } }, items.map(item => h(Button, { key: item.id, role: 'menuitem', disabled: item.disabled, onClick: () => { menu.current.hidePopover(); if (item.id === 'export') onExport(); else onReload(); } }, item.label))));
+        }
+        function ToolPagination({ kind, total, page, pages, size, setPage, setSize, disabled }) {
+          return h('div', { className: 'lanw-row lanw-model-footer', 'data-tool-pagination': kind },
+            h('span', { className: 'lanw-help' }, `${total} ${t('executionToolsCount')}`),
+            h('label', { className: 'lanw-model-size' }, h('span', null, t('toolsPerPage')), h('select', { 'aria-label': t('toolsPerPage'), value: size, disabled, onChange: event => setSize(Number(event.target.value)) }, [5, 10, 20].map(value => h('option', { key: value, value }, value)))),
+            h(Pager, { page, pages, setPage, disabled }));
+        }
+        function CliToolsManager({ request, onSaved, disabled }) {
+          const [saved, setSaved] = React.useState(null), [draft, setDraft] = React.useState(null);
+          const [page, setPage] = React.useState(0), [size, setSize] = React.useState(5);
+          const [target, setTarget] = React.useState(''), identified = React.useRef(null);
+          const [manualEntry, setManualEntry] = React.useState(false);
+          const [imported, setImported] = React.useState(null), inputFile = React.useRef(null);
+          const [editing, setEditing] = React.useState(null), [removing, setRemoving] = React.useState(null);
+          const [busy, setBusy] = React.useState(false), [problem, setProblem] = React.useState(''), [notice, setNotice] = React.useState('');
+          const blocked = disabled || busy;
+          async function load() {
+            setBusy(true); setProblem(''); setNotice('');
+            try { setSaved(await request('admin.cliTools', { operation: 'read' })); setPage(0); setDraft(null); setImported(null); setEditing(null); setRemoving(null); }
+            catch (error) { setProblem(error.message); }
+            finally { setBusy(false); }
+          }
+          React.useEffect(() => { load(); }, []);
+          const change = fields => { setDraft(old => ({ ...old, ...fields })); setProblem(''); setNotice(''); };
+          function edit(tool, index) {
+            setEditing(index); setRemoving(null); setProblem(''); setNotice(''); setTarget(''); setManualEntry(false); identified.current = null;
+            setDraft({ id: tool?.id ?? '', label: tool?.label ?? '', command: tool?.command ?? '', enabled: tool?.enabled !== false,
+              args: [...(tool?.args ?? [])], paths: (tool?.readOnlyPaths ?? []).join('\n'),
+              environment: Object.entries(tool?.environment ?? {}), credentials: Object.entries(tool?.credentials ?? {}) });
+          }
+          async function inspectTarget() {
+            if (blocked || !target.trim()) return;
+            setBusy(true); setProblem(''); setNotice('');
+            try {
+              const { tool } = await request('admin.cliTools', { operation: 'inspect', target: target.trim() });
+              const last = identified.current;
+              setDraft(previous => ({ ...previous, id: !previous.id || previous.id === last?.id ? tool.id : previous.id,
+                label: !previous.label || previous.label === last?.label ? tool.label : previous.label, command: tool.command, paths: tool.readOnlyPaths.join('\n') }));
+              identified.current = tool;
+              setNotice(t('cliInspected'));
+            } catch (error) { setProblem(error.message); } finally { setBusy(false); }
+          }
+          function dictionary(rows) {
+            const result = {};
+            for (const [raw, value] of rows) {
+              const name = raw.trim();
+              if (!name || Object.hasOwn(result, name)) throw new Error(t('cliDuplicateVariable'));
+              Object.defineProperty(result, name, { value, enumerable: true, configurable: true });
+            }
+            return result;
+          }
+          async function importFile(event) {
+            const file = event.target.files?.[0]; event.target.value = '';
+            if (!file) return;
+            try {
+              if (file.size > 128 * 1024) throw new Error(t('executionConfigError'));
+              const value = JSON.parse(await file.text());
+              if (value.format !== 'dsh-execution-tools' || value.version !== 1 || !Array.isArray(value.tools) || !value.executionTools || Object.keys(value).some(key => !['format', 'version', 'tools', 'executionTools'].includes(key))) throw new Error(t('executionConfigError'));
+              setImported(value); setProblem(''); setNotice(t('executionImportReady'));
+            } catch { setProblem(t('executionConfigError')); }
+          }
+          async function persist(tools, executionTools) {
+            setBusy(true); setProblem(''); setNotice('');
+            try {
+              const result = await request('admin.cliTools', { operation: 'save', expectedRevision: saved.revision, tools, ...(executionTools ? { executionTools } : {}) });
+              setSaved(result); setDraft(null); setImported(null); setEditing(null); setRemoving(null); setNotice(t('cliSaved'));
+              try { await onSaved(); } catch (error) { setProblem(error.message); }
+            } catch (error) { setProblem(error.message); }
+            finally { setBusy(false); }
+          }
+          function submit(event) {
+            event.preventDefault();
+            if (blocked) return;
+            try {
+              const tool = { id: draft.id.trim(), label: draft.label.trim() || draft.id.trim(), command: draft.command.trim(), enabled: draft.enabled,
+                args: draft.args, readOnlyPaths: draft.paths.split('\n').map(path => path.trim()).filter(Boolean),
+                environment: dictionary(draft.environment), credentials: dictionary(draft.credentials) };
+              const tools = [...saved.tools];
+              if (editing === -1) tools.push(tool); else tools[editing] = tool;
+              void persist(tools);
+            } catch (error) { setProblem(error.message); }
+          }
+          function pairFields(key, label, valueLabel, addLabel) {
+            return h('div', { className: 'lanw-stack' }, h('strong', null, t(label)),
+              draft[key].map(([name, value], index) => h('div', { key: index, className: 'lanw-cli-pair' },
+                h('input', { 'aria-label': `${t('cliVariable')} ${index + 1}`, value: name, placeholder: 'VARIABLE_NAME', onChange: event => change({ [key]: draft[key].map((row, i) => i === index ? [event.target.value, row[1]] : row) }) }),
+                h('input', { 'aria-label': `${t(valueLabel)} ${index + 1}`, value, placeholder: t(valueLabel), autoComplete: 'off', onChange: event => change({ [key]: draft[key].map((row, i) => i === index ? [row[0], event.target.value] : row) }) }),
+                h(Button, { 'aria-label': `${t('cliRemove')} ${t(label)} ${index + 1}`, onClick: () => change({ [key]: draft[key].filter((_, i) => i !== index) }) }, t('cliRemove')))),
+              h(Button, { className: 'lanw-cli-add-row', onClick: () => change({ [key]: [...draft[key], ['', '']] }) }, t(addLabel)));
+          }
+          const showConfiguration = Boolean(draft && (editing !== -1 || manualEntry || draft.command));
+          const pages = Math.max(1, Math.ceil((saved?.tools.length ?? 0) / size)), current = Math.min(page, pages - 1);
+          React.useEffect(() => { setPage(previous => Math.min(previous, pages - 1)); }, [pages]);
+          return h('div', { className: 'lanw-stack lanw-cli-manager', 'data-cli-manager': true, 'aria-busy': busy },
+            !draft && h('div', { className: 'lanw-execution-toolbar' }, h(Button, { primary: true, disabled: blocked || !saved, onClick: () => edit(null, -1) }, t('cliAdd')),
+              h(Button, { disabled: blocked || !saved, onClick: () => inputFile.current?.click() }, t('executionImport')),
+              h(ExecutionMore, { disabled: blocked || !saved, onExport: () => downloadExecutionConfiguration(saved), onReload: load }),
+              h('input', { type: 'file', accept: '.json,application/json', ref: inputFile, hidden: true, 'aria-label': t('executionImport'), onChange: importFile })),
+            problem && h('p', { className: 'lanw-error', role: 'alert' }, problem),
+            notice && h('p', { className: 'lanw-help', role: 'status' }, notice),
+            imported && h('div', { className: 'lanw-stack', 'data-execution-import-preview': true },
+              h('p', { className: 'lanw-help' }, `CLI: ${imported.tools.length} · ${t('executionSources')}: ${Array.isArray(imported.executionTools.sources) ? imported.executionTools.sources.length : '—'} · ${t('executionSave')}: ${Array.isArray(imported.executionTools.grants) ? imported.executionTools.grants.length : '—'}`),
+              h('div', { className: 'lanw-row' }, h(Button, { primary: true, disabled: blocked, onClick: () => persist(imported.tools, imported.executionTools) }, t('executionImportSave')), h(Button, { disabled: blocked, onClick: () => setImported(null) }, t('cancel')))),
+            !saved && !problem && h('p', { className: 'lanw-help' }, t('loading')),
+            !draft && saved && (saved.tools.length ? h('div', { className: 'lanw-stack' }, saved.tools.map((tool, index) => ({ tool, index })).slice(current * size, (current + 1) * size).map(({ tool, index }) => h('div', { className: 'lanw-cli-card', key: tool.id, 'data-cli-tool': tool.id },
+              h('div', { className: 'lanw-row' }, h('div', { className: 'lanw-cli-summary' }, h('strong', null, tool.label), h('span', { className: 'lanw-cli-meta' }, h('code', null, tool.id), h('span', { className: 'lanw-cli-path' }, tool.command))),
+                tool.enabled === false && h('span', { className: 'lanw-help' }, t('cliDisabled')),
+                h(Button, { disabled: blocked, onClick: () => edit(tool, index), 'aria-label': `${t('edit')} ${tool.label}` }, t('edit')),
+                h(Button, { disabled: blocked, onClick: () => setRemoving(index), 'aria-label': `${t('cliRemove')} ${tool.label}` }, t('cliRemove'))),
+              removing === index && h('div', { className: 'lanw-stack' }, h('p', { className: 'lanw-help' }, t('cliRemoveConfirm')), h('p', { className: 'lanw-help' }, t('cliSaveNote')),
+                h('div', { className: 'lanw-row' }, h(Button, { primary: true, disabled: blocked, onClick: () => persist(saved.tools.filter((_, i) => i !== index)) }, t('cliConfirmRemove')), h(Button, { disabled: blocked, onClick: () => setRemoving(null) }, t('cancel'))))))) : h('p', { className: 'lanw-empty' }, t('cliNoTools'))),
+            !draft && saved && h(ToolPagination, { kind: 'manual', total: saved.tools.length, page: current, pages, size, disabled: blocked, setPage, setSize: value => { setSize(value); setPage(0); } }),
+            draft && h('form', { onSubmit: submit, 'data-cli-editor': true }, h('fieldset', { className: 'lanw-fieldset lanw-stack', disabled: blocked },
+              editing === -1 && h('div', { className: 'lanw-stack', 'data-cli-target': true },
+                h(Field, { label: t('cliTarget'), description: t('cliTargetNote'), value: target, maxLength: 4096, placeholder: 'rg',
+                  onChange: event => { setTarget(event.target.value); setProblem(''); setNotice(''); },
+                  onKeyDown: event => { if (event.key === 'Enter' && !event.nativeEvent?.isComposing && event.nativeEvent?.keyCode !== 229) { event.preventDefault(); void inspectTarget(); } } }),
+                h('div', { className: 'lanw-row' }, h(Button, { primary: !showConfiguration, disabled: blocked || !target.trim(), onClick: inspectTarget }, t('cliInspect')),
+                  !showConfiguration && h(Button, { disabled: blocked, onClick: () => setManualEntry(true) }, t('cliConfigureManually')))),
+              showConfiguration && h('div', { className: 'lanw-stack' }, h('div', { className: 'lanw-cli-grid' }, h(Field, { label: t('cliCommandName'), name: 'cli-id', value: draft.id, required: true, maxLength: 64, placeholder: 'smart-search', onChange: event => change({ id: event.target.value }) }),
+                h(Field, { label: t('cliDisplayName'), name: 'cli-label', value: draft.label, maxLength: 120, placeholder: 'Smart Search', onChange: event => change({ label: event.target.value }) })),
+              h(Field, { label: t('cliProgram'), description: t('cliProgramNote'), name: 'cli-command', value: draft.command, required: true, placeholder: '/usr/bin/python3', onChange: event => change({ command: event.target.value }) }),
+              h(FeatureToggle, { label: t('cliEnabled'), checked: draft.enabled, onChange: event => change({ enabled: event.target.checked }) }),
+              h('div', { className: 'lanw-stack' }, h('strong', null, t('cliArguments')), draft.args.map((arg, index) => h('div', { className: 'lanw-cli-argument', key: index },
+                h('input', { 'aria-label': `${t('cliArgument')} ${index + 1}`, value: arg, onChange: event => change({ args: draft.args.map((item, i) => i === index ? event.target.value : item) }) }),
+                h(Button, { 'aria-label': `${t('cliRemove')} ${t('cliArgument')} ${index + 1}`, onClick: () => change({ args: draft.args.filter((_, i) => i !== index) }) }, t('cliRemove')))),
+                h(Button, { className: 'lanw-cli-add-row', onClick: () => change({ args: [...draft.args, ''] }) }, t('cliAddArgument'))),
+              h(Field, { label: t('cliPaths'), description: t('cliPathsNote') }, h('textarea', { name: 'cli-paths', rows: 3, value: draft.paths, placeholder: '/srv/dsh-tools/smart-search', onChange: event => change({ paths: event.target.value }) }))),
+              showConfiguration && h('details', { className: 'lanw-cli-advanced' }, h('summary', null, t('cliAdvanced')), h('div', { className: 'lanw-stack' },
+                pairFields('environment', 'cliEnvironment', 'cliValue', 'cliAddVariable'), h('p', { className: 'lanw-help' }, t('cliCredentialNote')), pairFields('credentials', 'cliCredentials', 'cliReference', 'cliAddCredential'))),
+              showConfiguration && h('p', { className: 'lanw-help' }, t('cliSaveNote')),
+              h('div', { className: 'lanw-row' }, showConfiguration && h(Button, { type: 'submit', primary: true }, t('save')), h(Button, { onClick: () => { setDraft(null); setEditing(null); setProblem(''); setNotice(''); } }, t('cancel')), showConfiguration && h(Button, { onClick: load }, t('reloadSharing'))))));
+        }
+        const capabilitySections = [['features', 'personalFunctions'], ['skills', 'accessSkills'], ['cliTools', 'accessCliTools'], ['mcpServers', 'accessMcp'], ['agentPresets', 'accessAgents'], ['plugins', 'accessPlugins'], ['permissionPresets', 'accessPermissions']];
         function CapabilityTabs({ active, onSelect, disabled, personal = false }) {
           return h('nav', { className: 'lanw-tabs lanw-capability-tabs', 'data-capability-tabs': personal ? 'personal' : 'administrator', 'aria-label': t(personal ? 'personalTab' : 'accessCapabilities') }, capabilitySections.map(([id, label]) => h(Button, {
             key: id, disabled, [personal ? 'data-personal-section' : 'data-capability-section']: id, 'aria-current': active === id ? 'page' : undefined, onClick: () => onSelect(id),
@@ -587,7 +1067,7 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
           async function save(event) {
             event.preventDefault(); if (blocked || !dirty || conflict) return;
             const access = copy(draft);
-            for (const [key, ids] of Object.entries(access)) if (Array.isArray(ids) && Array.isArray(value.granted[key])) access[key] = ids.filter(id => value.granted[key].includes(id));
+            for (const [key, ids] of Object.entries(access)) if (Array.isArray(ids) && Array.isArray(value.granted[key]) && (key !== 'tools' || access.toolMode !== 'blacklist' && value.granted.toolMode === 'whitelist')) access[key] = ids.filter(id => value.granted[key].includes(id));
             if (await onSave({ access, expectedRevision: revision })) { setDraft(access); setBaseline(JSON.stringify(access)); setRevision(revision + 1); }
           }
           async function reload() {
@@ -728,19 +1208,23 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
             finally { if (current === epoch.current) setPending(false); }
           }
           React.useEffect(() => { if (open) void load(); return () => { epoch.current++; }; }, [open, userId, revision]);
-          const scope = value => typeof value === 'boolean' ? t(value ? 'scopeEnabled' : 'scopeDisabled') : value === null ? t('scopeAll') : value?.length ? value.join(', ') : t('scopeNone');
+          const scope = (value, key, policy) => key === 'tools' ? `${t((policy.toolMode ?? (Array.isArray(value) ? 'whitelist' : 'blacklist')) === 'whitelist' ? 'toolWhitelist' : 'toolBlacklist')} · ${value?.length ? value.join(', ') : t('scopeNone')}` : typeof value === 'boolean' ? t(value ? 'scopeEnabled' : 'scopeDisabled') : value === null ? t('scopeAll') : value?.length ? value.join(', ') : t('scopeNone');
           const reason = key => {
             if (value.user.disabled) return t('accountUnavailable');
             const grant = value.preferences.granted[key], selection = value.preferences.selection[key];
+            if (key === 'tools') {
+              const limited = policy => (policy.toolMode ?? (Array.isArray(policy.tools) ? 'whitelist' : 'blacklist')) === 'whitelist' || list(policy.tools).length > 0;
+              return [limited(value.preferences.granted) ? t('grantLimited') : '', limited(value.preferences.selection) ? t('personallyLimited') : ''].filter(Boolean).join(' · ');
+            }
             return [grant === false || Array.isArray(grant) ? t('grantLimited') : '', selection === false || Array.isArray(selection) ? t('personallyLimited') : ''].filter(Boolean).join(' · ');
           };
-          const labels = { terminal: 'capabilityTerminal', files: 'capabilityFiles', attachments: 'capabilityAttachments', tasks: 'capabilityTasks', subagents: 'capabilitySubagents', interactions: 'capabilityInteractions', tools: 'toolNames', skills: 'accessSkills', agentPresets: 'accessAgents', permissionPresets: 'accessPermissions', plugins: 'accessPlugins', mcpServers: 'accessMcp' };
+          const labels = { terminal: 'capabilityTerminal', files: 'capabilityFiles', attachments: 'capabilityAttachments', tasks: 'capabilityTasks', subagents: 'capabilitySubagents', interactions: 'capabilityInteractions', tools: 'toolNames', skills: 'accessSkills', agentPresets: 'accessAgents', permissionPresets: 'accessPermissions', plugins: 'accessPlugins', mcpServers: 'accessMcp', cliTools: 'accessCliTools' };
           return h('details', { className: 'lanw-effective-access', 'data-effective-access': true, onToggle: event => setOpen(event.currentTarget.open) }, h('summary', null, t('effectiveAccess')),
             open && h('div', { className: 'lanw-stack', 'aria-busy': pending }, h('p', { className: 'lanw-help' }, t('effectiveAccessNote')),
               h(Button, { disabled: pending, onClick: load }, t('refresh')), problem && h('p', { className: 'lanw-error', role: 'alert' }, problem),
               value && h(React.Fragment, null, value.user.disabled && h('p', { role: 'status', className: 'lanw-help' }, t('accountDisabledNote')),
                 h('div', { className: 'lanw-tablewrap' }, h('table', null, h('thead', null, h('tr', null, h('th', null, t('accessCapabilities')), ...['grantedColumn', 'selectedColumn', 'effectiveColumn'].map(key => h('th', { key }, t(key))))),
-                  h('tbody', null, Object.entries(labels).map(([key, label]) => h('tr', { key }, h('th', { scope: 'row' }, t(label)), ...['granted', 'selection', 'effective'].map(field => h('td', { key: field }, scope(value.preferences[field][key]), field === 'effective' && reason(key) && h('p', { className: 'lanw-help' }, reason(key))))))))),
+                  h('tbody', null, Object.entries(labels).map(([key, label]) => h('tr', { key }, h('th', { scope: 'row' }, t(label)), ...['granted', 'selection', 'effective'].map(field => h('td', { key: field }, scope(value.preferences[field][key], key, value.preferences[field]), field === 'effective' && reason(key) && h('p', { className: 'lanw-help' }, reason(key))))))))),
                 h('p', { className: 'lanw-help' }, `${t('effectiveModels')}: ${value.routes.map(row => row.label).join(', ') || t('scopeNone')}`))));
         }
         function InvitationManager({ request, onIssued, refreshKey, disabled }) {
@@ -810,16 +1294,16 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
           return h('details', { className: 'lanw-card', 'data-model-catalog': true, open, onToggle: event => setOpen(event.currentTarget.open) }, h('summary', null, `${t('routes')} · ${modelGroups(catalog).length} ${t('modelsCount')} / ${catalog.length} ${t('variantsCount')}`),
             open && h('div', { className: 'lanw-stack' }, h('p', { className: 'lanw-help' }, t('routeNote')), h(ModelBrowser, { catalog })));
         }
-        function CapabilityPolicy({ account = {}, tools, panel = false }) {
+        function CapabilityPolicy({ account = {}, tools, panel = false, pending = false }) {
           const access = account.access || {}, flags = ['terminal', 'files', 'attachments', 'tasks', 'subagents', 'interactions'];
           const [enabled, setEnabled] = React.useState(() => flags.filter(key => access[key] !== false)), [expanded, setExpanded] = React.useState(false);
-          const [custom, setCustom] = React.useState(() => Array.isArray(access.tools));
+          const [mode, setMode] = React.useState(() => access.toolMode ?? (Array.isArray(access.tools) ? 'whitelist' : 'blacklist'));
           const [selected, setSelected] = React.useState(() => list(access.tools));
           return h(panel ? 'section' : 'details', { className: panel ? 'lanw-policy-pane' : 'lanw-policy', 'data-capability-policy': true, ...(panel ? {} : { open: expanded, onToggle: event => setExpanded(event.currentTarget.open) }) }, h(panel ? 'p' : 'summary', { className: panel ? 'lanw-policy-summary' : undefined }, !panel && h('span', null, t('capabilityAccess')), h('span', { className: 'lanw-policy-state' }, `${enabled.length} / ${flags.length}`)),
             h('div', { className: 'lanw-stack' }, h('div', { className: 'lanw-capability-grid' }, flags.map(key => h(panel ? FeatureToggle : Check, { key, name: `access.${key}`, checked: enabled.includes(key), onChange: event => setEnabled(old => event.target.checked ? [...old, key] : old.filter(value => value !== key)), label: t(`capability${key[0].toUpperCase()}${key.slice(1)}`) }))),
-              h(Field, { label: t('toolAccess') }, h('select', { name: 'toolAccess', value: custom ? 'custom' : 'inherit', onChange: event => setCustom(event.target.value === 'custom') }, h('option', { value: 'inherit' }, t('inheritTools')), h('option', { value: 'custom' }, t('customTools')))),
-              custom && h('p', { className: 'lanw-help' }, t('toolsNote')),
-              h('fieldset', { className: 'lanw-fieldset lanw-stack', disabled: !custom, hidden: !custom },
+              h(Field, { label: t('toolAccess') }, h('select', { name: 'toolAccess', value: mode, onChange: event => setMode(event.target.value) }, h('option', { value: 'blacklist' }, t('toolBlacklist')), h('option', { value: 'whitelist' }, t('toolWhitelist')))),
+              h('p', { className: 'lanw-help', 'data-tool-mode-note': mode }, t(mode === 'blacklist' ? 'toolBlacklistNote' : 'toolWhitelistNote')),
+              h('fieldset', { className: 'lanw-fieldset lanw-capability-resources', disabled: pending, 'data-tool-selection': mode },
                 [...new Set([...tools, ...selected])].sort().map(name => h(Check, { key: name, name: 'toolNames', value: name, checked: selected.includes(name), label: name, onChange: event => setSelected(old => event.target.checked ? [...old, name] : old.filter(value => value !== name)) })))));
         }
         function ResourcePolicy({ account = {}, catalog, complete, field = 'skills', panel = false }) {
@@ -829,6 +1313,7 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
             permissionPresets: ['permission-preset', 'permissionPresetNames', 'permissionPresetAccess', 'inheritPermissionPresets', 'customPermissionPresets', 'permissionPresetsNote'],
             plugins: ['plugin', 'pluginNames', 'pluginAccess', 'inheritPlugins', 'customPlugins', 'pluginsNote'],
             mcpServers: ['mcp-server', 'mcpServerNames', 'mcpAccess', 'inheritMcp', 'customMcp', 'mcpNote'],
+            cliTools: ['cli', 'cliNames', 'cliAccess', 'inheritCli', 'customCli', 'cliNote'],
           }[field];
           const [custom, setCustom] = React.useState(() => Array.isArray(account.access?.[field]));
           const [selected, setSelected] = React.useState(() => list(account.access?.[field]));
@@ -840,16 +1325,17 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
               h(Field, { label: t(panel ? 'accessMode' : title) }, h('select', { name: field + 'Mode', value: custom ? 'custom' : 'inherit', onChange: event => setCustom(event.target.value === 'custom') }, h('option', { value: 'inherit' }, t(inheritLabel)), h('option', { value: 'custom' }, t(customLabel)))),
               custom && h('p', { className: 'lanw-help' }, t(note)),
               field === 'mcpServers' && !catalog.length && h('p', { className: 'lanw-help' }, t('noMcpServers')),
+              field === 'cliTools' && !catalog.length && h('p', { className: 'lanw-help' }, t('cliEmpty')),
               complete === false && h('p', { className: 'lanw-help', role: 'status' }, t(field === 'plugins' ? 'pluginDiscoveryIncomplete' : 'skillDiscoveryIncomplete')),
               h(CapabilityChoices, { catalog: [...rows.values()].sort((a, b) => a.id.localeCompare(b.id)), selected, name: names, disabled: !custom, hidden: !custom, onChange: (id, checked) => setSelected(old => checked ? [...old, id] : old.filter(value => value !== id)) })));
         }
         function AdministratorCapabilities({ account, catalog, pending }) {
           const [section, setSection] = React.useState('features');
-          const catalogs = { skills: ['skillCatalog', catalog.skillCatalogComplete], mcpServers: ['mcpCatalog'], agentPresets: ['agentPresetCatalog'], plugins: ['pluginCatalog', list(catalog.unAttributedTools).length === 0], permissionPresets: ['permissionPresetCatalog'] };
+          const catalogs = { skills: ['skillCatalog', catalog.skillCatalogComplete], cliTools: ['cliCatalog'], mcpServers: ['mcpCatalog'], agentPresets: ['agentPresetCatalog'], plugins: ['pluginCatalog', list(catalog.unAttributedTools).length === 0], permissionPresets: ['permissionPresetCatalog'] };
           return h('div', { className: 'lanw-stack lanw-capability-settings', 'data-admin-capabilities': true },
             h(CapabilityTabs, { active: section, onSelect: setSection, disabled: pending }),
             capabilitySections.map(([id]) => h('section', { key: id, hidden: section !== id, 'data-capability-panel': id }, id === 'features'
-              ? h(CapabilityPolicy, { account, panel: true, tools: list(catalog.toolCatalog) })
+              ? h(CapabilityPolicy, { account, panel: true, pending, tools: list(catalog.toolCatalog) })
               : h(ResourcePolicy, { account, panel: true, field: id, catalog: list(catalog[catalogs[id][0]]), complete: catalogs[id][1] }))));
         }
         function DirectoryPolicy({ account = {}, panel = false, recommendedPath, onRecommended }) {
@@ -1316,10 +1802,11 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
             setOpen(false); onAction(id, item, opener.current);
           }, anchor: h(Button, { disabled: pending, 'data-content-manage': item.sessionId ?? item.path, 'aria-label': `${t('contentManage')} ${item.title ?? item.name}`, 'aria-haspopup': 'menu', 'aria-expanded': open, onClick: event => { opener.current = event?.currentTarget ?? null; setOpen(value => !value); } }, t('contentManage')) }));
         }
-        function ContentManager({ users, userPage, request, active, closeSettings, capturePreviewRelease, administratorId, returnPoint, own = false, fileAccess = true, historicalAccounts = false, sidebarCommand, onSidebarClose }) {
+        function ContentManager({ users, userPage, request, active, closeSettings, capturePreviewRelease, administratorId, returnPoint, own = false, fileAccess = true, historicalAccounts = false, sidebarCommand, onSidebarClose, pageMode, onModeChange }) {
           const contentEndpoint = own ? 'member.content' : 'admin.content';
           const [recycleOpen, setRecycleOpen] = React.useState(false);
-          const [mode, setMode] = React.useState(returnPoint?.mode ?? 'sessions'), [userId, setUserId] = React.useState(returnPoint?.userId ?? '');
+          const [localMode, setLocalMode] = React.useState(returnPoint?.mode ?? 'sessions'), [userId, setUserId] = React.useState(returnPoint?.userId ?? '');
+          const mode = pageMode ?? localMode, setMode = onModeChange ?? setLocalMode;
           const [path, setPath] = React.useState(returnPoint?.path ?? ''), [query, setQuery] = React.useState(returnPoint?.query ?? ''), [offset, setOffset] = React.useState(returnPoint?.offset ?? 0);
           const [sessionFilters, setSessionFilters] = React.useState(returnPoint?.sessionFilters ?? sessionDefaults), [fileFilters, setFileFilters] = React.useState(returnPoint?.fileFilters ?? fileDefaults), [fileQuery, setFileQuery] = React.useState(returnPoint?.fileQuery ?? ''), [filtersOpen, setFiltersOpen] = React.useState(false);
           const [result, setResult] = React.useState(() => returnPoint?.listing ?? { items: [], total: 0 }), [loading, setLoading] = React.useState(false), [pending, setPending] = React.useState(false);
@@ -1327,6 +1814,11 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
           const [progress, setProgress] = React.useState(null), [download, setDownload] = React.useState(null);
           const alive = React.useRef(true), sequence = React.useRef(0), working = React.useRef(false), cancel = React.useRef(false), uploadInput = React.useRef(null), uploadTarget = React.useRef(null), downloadLink = React.useRef(null);
           const root = React.useRef(null), restorePosition = React.useRef(returnPoint);
+          const previousMode = React.useRef(mode);
+          React.useEffect(() => {
+            if (previousMode.current === mode) return;
+            previousMode.current = mode; setOffset(0); setProblem(''); setMessage(''); setFiltersOpen(false);
+          }, [mode]);
           const selected = own ? users[0]?.id : mode === 'files' ? userId || users[0]?.id : userId;
           const [chosenUser, setChosenUser] = React.useState(() => returnPoint?.selectedUser ?? null);
           const selectedUser = users.find(user => user.id === selected) || (chosenUser?.id === selected ? chosenUser : null);
@@ -1500,12 +1992,12 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
             !sidebarCommand && h(React.Fragment, null,
             filtersOpen && h(ContentFilters, { mode, value: conditions, onClose: () => setFiltersOpen(false), onApply: value => { if (mode === 'sessions') setSessionFilters(value); else setFileFilters(value); setOffset(0); } }),
             recycleOpen && selectedUser && h(RecycleBin, { user: selectedUser, request, contentEndpoint, onClose: () => { setRecycleOpen(false); void load(); } }),
-            h('p', { className: 'lanw-help' }, t('contentNote')),
+            !pageMode && h('p', { className: 'lanw-help' }, t('contentNote')),
             !own && h('div', { className: 'lanw-content-scope' },
               h('div', { className: 'lanw-field lanw-content-member' }, h('span', null, t('contentMember')), h(MemberPicker, { users, userPage, request, active, includeHistory: !own && historicalAccounts, value: selected ?? '', disabled: pending, testId: 'data-content-member', label: t('contentMember'), allowAll: mode === 'sessions', onSelect: row => { setChosenUser(row); setUserId(row?.id ?? ''); openDirectory(''); } })),
               h(Button, { className: 'lanw-iconbutton', disabled: loading || pending, 'aria-label': t('contentRefresh'), 'aria-busy': loading, 'data-refresh-account': true, onClick: load }, h(IconRefreshOutlineRegular))),
-            h('div', { className: 'lanw-content-toolbar' },
-              h('div', { className: 'lanw-tabs', role: 'tablist' }, ['sessions', 'files'].map(value => h(Button, { key: value, role: 'tab', 'aria-selected': mode === value, 'data-content-mode': value, disabled: pending || own && !fileAccess && value === 'files', onClick: () => { setMode(value); setOffset(0); setPath(''); setMessage(''); } }, h(NavigationLabel, { id: value }, t(value === 'sessions' ? 'contentSessions' : 'contentFiles'))))),
+            (mode === 'files' || own || !pageMode) && h('div', { className: 'lanw-content-toolbar' },
+              !pageMode && h('div', { className: 'lanw-tabs', role: 'tablist' }, ['sessions', 'files'].map(value => h(Button, { key: value, role: 'tab', 'aria-selected': mode === value, 'data-content-mode': value, disabled: pending || own && !fileAccess && value === 'files', onClick: () => { setMode(value); setOffset(0); setPath(''); setMessage(''); } }, h(NavigationLabel, { id: value }, t(value === 'sessions' ? 'contentSessions' : 'contentFiles'))))),
               h('div', { className: 'lanw-content-file-actions' }, mode === 'files' && h(React.Fragment, null,
                 h(Button, { disabled: pending, className: 'lanw-btn-secondary', onClick: () => setRecycleOpen(true), 'data-open-recycle': true }, t('recycleBin')), h(Button, { disabled: pending, className: 'lanw-btn-secondary', onClick: () => startDialog('newFolder') }, t('contentNewFolder')), h(Button, { disabled: pending, className: 'lanw-btn-secondary', onClick: () => startDialog('newFile') }, t('contentNewFile')), h(Button, { disabled: pending, primary: true, onClick: () => chooseUpload() }, t('contentUpload'))),
                 own && h(Button, { className: 'lanw-iconbutton', disabled: loading || pending, 'aria-label': t('contentRefresh'), 'aria-busy': loading, 'data-refresh-account': true, onClick: load }, h(IconRefreshOutlineRegular)))),
@@ -1580,7 +2072,7 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
             h('div', { className: 'lanw-edit-layout' }, sections && h('nav', { className: 'lanw-access-nav', 'aria-label': t('accountAuthorization') }, [...new Set(sections.map(section => section.group))].map(group =>
               h('div', { key: group || 'default', className: 'lanw-access-group', 'data-access-group': group }, group && h('h3', { className: 'lanw-access-group-title' }, t(group)),
                 sections.filter(section => section.group === group).map(section => h(Button, { key: section.id, disabled: pending, 'data-access-section': section.id, 'aria-current': activeSection === section.id ? 'page' : undefined, 'aria-controls': `lanw-access-${section.id}`, onClick: () => onSelect(section.id) }, h(NavigationLabel, { id: section.id }, section.label)))))),
-              h('div', { ref: body, className: 'lanw-edit-body', onInvalidCapture: event => { const pane = event.target.closest('[data-access-panel]'); if (pane && onSelect) { event.preventDefault(); onSelect(pane.dataset.accessPanel); requestAnimationFrame(() => event.target.focus()); } }, onClickCapture: event => { if (confirmChanges && event.target.closest('[role=switch]')) { setDirty(true); setConfirmClose(false); } }, onChangeCapture: event => { if (event?.target?.closest('[data-member-picker]')) return; if (confirmChanges) setDirty(true); setConfirmClose(false); } }, sections && h(PageHeading, { title: sections.find(section => section.id === activeSection)?.label, description: sections.find(section => section.id === activeSection)?.description }), children)),
+              h('div', { ref: body, className: 'lanw-edit-body', onInvalidCapture: event => { const pane = event.target.closest('[data-access-panel]'); if (pane && onSelect) { event.preventDefault(); onSelect(pane.dataset.accessPanel); requestAnimationFrame(() => event.target.focus()); } }, onClickCapture: event => { const owner = event?.target?.closest?.('[data-edit-dialog]'); if (dialog.current && owner && owner !== dialog.current) return; if (confirmChanges && event.target.closest('[role=switch]')) { setDirty(true); setConfirmClose(false); } }, onChangeCapture: event => { const owner = event?.target?.closest?.('[data-edit-dialog]'); if (dialog.current && owner && owner !== dialog.current) return; if (event?.target?.closest('[data-member-picker]') || event?.target?.closest('[data-edit-filter]')) return; if (confirmChanges) setDirty(true); setConfirmClose(false); } }, sections && h(PageHeading, { title: sections.find(section => section.id === activeSection)?.label, description: sections.find(section => section.id === activeSection)?.description }), children)),
             h('div', { className: 'lanw-edit-footer' }, !hideCancel && h(Button, { disabled: pending, onClick: requestClose }, t('cancelEdit')), footer));
         }
         function Icon({ size, active }) {
@@ -1649,6 +2141,8 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
           const [remember, setRemember] = React.useState(true);
           const [tab, setTab] = React.useState(previewReturn ? previewReturn.self ? 'content' : 'admin' : (identity ?? window.__DSH_LAN_MEMBER__?.user)?.role === 'member' ? 'account' : 'admin');
           const [adminTab, setAdminTab] = React.useState(previewReturn ? 'content' : 'accounts');
+          const [contentMode, setContentMode] = React.useState(previewReturn?.mode ?? 'sessions');
+          const [sharingTab, setSharingTab] = React.useState('resources');
           const [visitedAdminTabs, setVisitedAdminTabs] = React.useState({ accounts: true, ...(previewReturn ? { content: true } : {}) });
           const [accountPanel, setAccountPanel] = React.useState('');
           const [accountOperation, setAccountOperation] = React.useState(null);
@@ -1990,12 +2484,13 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
               pane('directories', h(DirectoryPolicy, { panel: editor, account })));
           }
           const accessData = data => ({ modelAccess: data.get('modelAccess'), ...(data.get('modelAccess') === 'custom' ? { routeIds: data.getAll('routeIds'), defaultRouteId: data.get('defaultRouteId') || null } : {}),
-            access: { ...Object.fromEntries(['terminal', 'files', 'attachments', 'tasks', 'subagents', 'interactions'].map(key => [key, data.has(`access.${key}`)])), tools: data.get('toolAccess') === 'custom' ? data.getAll('toolNames') : null,
+            access: { ...Object.fromEntries(['terminal', 'files', 'attachments', 'tasks', 'subagents', 'interactions'].map(key => [key, data.has(`access.${key}`)])), toolMode: ['whitelist', 'custom'].includes(data.get('toolAccess')) ? 'whitelist' : 'blacklist', tools: ['inherit', null].includes(data.get('toolAccess')) ? null : data.getAll('toolNames'),
               ...(data.has('skillsMode') ? { skills: data.get('skillsMode') === 'custom' ? data.getAll('skillNames') : null } : {}),
               ...(data.has('agentPresetsMode') ? { agentPresets: data.get('agentPresetsMode') === 'custom' ? data.getAll('agentPresetNames') : null } : {}),
               ...(data.has('permissionPresetsMode') ? { permissionPresets: data.get('permissionPresetsMode') === 'custom' ? data.getAll('permissionPresetNames') : null } : {}),
               ...(data.has('pluginsMode') ? { plugins: data.get('pluginsMode') === 'custom' ? data.getAll('pluginNames') : null } : {}),
               ...(data.has('mcpServersMode') ? { mcpServers: data.get('mcpServersMode') === 'custom' ? data.getAll('mcpServerNames') : null } : {}),
+              ...(data.has('cliToolsMode') ? { cliTools: data.get('cliToolsMode') === 'custom' ? data.getAll('cliNames') : null } : {}),
               ...(data.has('sharedDirectories') ? { sharedDirectories: JSON.parse(data.get('sharedDirectories')) } : {}) } });
           const passwordField = autocomplete => h(Field, { label: t('longPassword'), name: 'password', type: 'password', required: true, minLength: 16, maxLength: 1024, autoComplete: autocomplete });
           const nameFields = () => h(React.Fragment, null,
@@ -2225,34 +2720,54 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
               h(InvitationManager, { request, disabled: isBusy, refreshKey: invite?.inviteToken, onIssued: result => { setInvite(result); setAccountPanel('invite'); setAccountSetupStep(1); setError(null); } }));
           }
 
+          function sharingView() {
+            const tabs = [['resources', 'sharingResourcesTab'], ['execution', 'executionToolCatalog'], ['directory', 'homeDirectory']];
+            return h('div', { className: 'lanw-stack', 'data-sharing-workspace': true },
+              h('div', { className: 'lanw-execution-tabs lanw-sharing-tabs', role: 'tablist', 'aria-label': t('sharingTab'), onKeyDown: event => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                event.preventDefault(); const index = tabs.findIndex(([id]) => id === sharingTab);
+                const next = tabs[event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length][0];
+                setSharingTab(next); event.currentTarget.querySelector(`[data-sharing-tab="${next}"]`)?.focus();
+              } }, tabs.map(([id, label]) => h(Button, { key: id, id: `lanw-sharing-tab-${id}`, role: 'tab', 'data-sharing-tab': id, 'aria-selected': sharingTab === id, 'aria-controls': `lanw-sharing-panel-${id}`, tabIndex: sharingTab === id ? 0 : -1, onClick: () => setSharingTab(id) }, t(label)))),
+              tabs.map(([id]) => h('section', { key: id, id: `lanw-sharing-panel-${id}`, className: 'lanw-sharing-panel', role: 'tabpanel', 'aria-labelledby': `lanw-sharing-tab-${id}`, hidden: sharingTab !== id },
+                id === 'resources' ? h(Card, { 'data-native-sharing': true },
+                  h('p', { className: 'lanw-help' }, t('nativeSharingNote')), detailNotice('catalog'),
+                  h('dl', { className: 'lanw-dl lanw-sharing-summary' }, [
+                    [t('pluginAccess'), list(admin.pluginCatalog).length], [t('toolAccess'), list(admin.toolCatalog).length],
+                    [t('skillAccess'), list(admin.skillCatalog).length], [t('agentPresetAccess'), list(admin.agentPresetCatalog).length], [t('mcpAccess'), list(admin.mcpCatalog).length],
+                  ].map(([label, count]) => h(React.Fragment, { key: label }, h('dt', null, label), h('dd', null, detailState.catalog?.ready ? number(count) : '—')))),
+                  actionButton(t('manageAccountAccess'), { className: 'lanw-btn-secondary', onClick: () => setAdminTab('accounts') }))
+                  : id === 'execution' ? h(SharedExecutionTools, { active: sharingTab === 'execution' && adminTab === 'sharing' && tab === 'admin', request, disabled: isBusy, onSaved: () => ensureDetails('catalog', true) })
+                  : h(HomeDirectory, { value: admin.homeDirectory, disabled: isBusy, onSave: fields => run('admin.updateHomeDirectory', fields), onReload: async () => (await loadSnapshot()).admin?.homeDirectory }))));
+          }
+
           function adminView() {
             if (!admin) return h('p', { className: 'lanw-empty', role: 'status' }, t(isBusy ? 'loading' : 'noAdmin'));
             return h('div', { className: 'lanw-stack', 'data-admin-console': true },
               ['accounts', 'content', 'models', 'sharing', 'branding'].filter(value => visitedAdminTabs[value]).map(value => h('section', {
-                key: value, className: 'lanw-adminpanel', id: `lanw-panel-${value}`, 'aria-labelledby': `lanw-tab-${value}`, hidden: adminTab !== value, 'data-admin-section': value,
-              }, value === 'accounts' ? accountsView() : value === 'content' ? h(ContentManager, { users: adminUsers, userPage: admin?.userPage, historicalAccounts: snapshot?.capabilities?.accountLifecycle === true, request, active: adminTab === 'content' && tab === 'admin', closeSettings: close, administratorId: user.id, returnPoint: previewReturn?.administratorId === user.id ? previewReturn : null, capturePreviewRelease: () => { const session = { ...auth.current }; return previewId => request('admin.content', { operation: 'preview.close', previewId }, false, '', session); } }) : value === 'models' ? h(ModelCatalog, { catalog: adminRoutes, initiallyOpen: true }) : value === 'branding' ? h(BrandingEditor, { value: snapshot.branding ?? branding, disabled: isBusy, onSave: fields => run('admin.updateBranding', fields), onReload: async () => { setError(null); return (await loadSnapshot()).branding; } }) : h('div', { className: 'lanw-stack' },
-                h(Card, { title: t('sharingTab'), 'data-native-sharing': true },
-                  h('p', { className: 'lanw-help' }, t('nativeSharingNote')),
-                  h('dl', { className: 'lanw-dl lanw-sharing-summary' }, [
-                    [t('pluginAccess'), list(admin.pluginCatalog).length], [t('toolAccess'), list(admin.toolCatalog).length],
-                    [t('skillAccess'), list(admin.skillCatalog).length], [t('agentPresetAccess'), list(admin.agentPresetCatalog).length], [t('mcpAccess'), list(admin.mcpCatalog).length],
-                  ].map(([label, count]) => h(React.Fragment, { key: label }, h('dt', null, label), h('dd', null, number(count))))),
-                  actionButton(t('manageAccountAccess'), { className: 'lanw-btn-secondary', onClick: () => setAdminTab('accounts') })),
-                h(HomeDirectory, { value: admin.homeDirectory, disabled: isBusy, onSave: fields => run('admin.updateHomeDirectory', fields), onReload: async () => (await loadSnapshot()).admin?.homeDirectory })))));
+                key: value, className: 'lanw-adminpanel', id: `lanw-panel-${value === 'content' ? contentMode : value}`, 'aria-labelledby': `lanw-tab-${value === 'content' ? contentMode : value}`, hidden: adminTab !== value, 'data-admin-section': value,
+              }, value === 'accounts' ? accountsView() : value === 'content' ? h(ContentManager, { pageMode: contentMode, onModeChange: setContentMode, users: adminUsers, userPage: admin?.userPage, historicalAccounts: snapshot?.capabilities?.accountLifecycle === true, request, active: adminTab === 'content' && tab === 'admin', closeSettings: close, administratorId: user.id, returnPoint: previewReturn?.administratorId === user.id ? previewReturn : null, capturePreviewRelease: () => { const session = { ...auth.current }; return previewId => request('admin.content', { operation: 'preview.close', previewId }, false, '', session); } }) : value === 'models' ? h(ModelCatalog, { catalog: adminRoutes, initiallyOpen: true }) : value === 'branding' ? h(BrandingEditor, { value: snapshot.branding ?? branding, disabled: isBusy, onSave: fields => run('admin.updateBranding', fields), onReload: async () => { setError(null); return (await loadSnapshot()).branding; } }) : sharingView())));
           }
 
           const activeTab = user !== null && user.role !== 'admin' && tab === 'admin' ? 'account' : tab;
-          const currentPage = activeTab === 'admin' ? adminTab : activeTab;
-          const needsCatalog = currentPage === 'preferences' || currentPage === 'accounts' && (['create', 'invite'].includes(accountPanel) || ['edit', 'bulk'].includes(accountPanel) && accountAccessTab === 'capabilities');
+          const activePage = activeTab === 'admin' ? adminTab : activeTab;
+          const currentPage = activePage === 'content' ? contentMode : activePage;
+          const needsCatalog = currentPage === 'preferences' || currentPage === 'sharing' && sharingTab === 'resources' || currentPage === 'accounts' && (['create', 'invite'].includes(accountPanel) || ['edit', 'bulk'].includes(accountPanel) && accountAccessTab === 'capabilities');
           const needsUsage = ['account', 'usage'].includes(currentPage) || currentPage === 'accounts' && accountPanel === 'edit' && accountAccessTab === 'limits';
           React.useEffect(() => {
             if (!snapshot || pending) return;
             if (needsCatalog) void ensureDetails('catalog');
             if (needsUsage) void ensureDetails('usage');
           }, [snapshot, pending, needsCatalog, needsUsage, ensureDetails]);
-          const pageLabels = { account: 'workspaceAccount', preferences: 'personalTab', accounts: 'memberAccounts', content: 'contentTab', models: 'sharedModels', sharing: 'sharingTab', branding: 'brandingTab', usage: 'usageStatistics' };
-          const pages = ['account', 'preferences', ...(user?.role === 'admin' ? ['accounts', 'content', 'models', 'sharing', 'branding'] : ['content']), 'usage'];
+          const pageLabels = { account: 'workspaceAccount', preferences: 'personalTab', accounts: 'memberAccounts', sessions: 'contentSessions', files: 'contentFiles', models: 'sharedModels', sharing: 'sharingTab', branding: 'brandingTab', usage: 'usageStatistics' };
+          const navigationGroups = [
+            ['personal', 'navigationPersonal', ['account', 'preferences', ...(user?.role === 'admin' ? [] : ['usage'])]],
+            ['workspace', 'navigationWorkspace', ['sessions', 'files']],
+            ...(user?.role === 'admin' ? [['management', 'navigationManagement', ['accounts', 'models', 'sharing', 'branding', 'usage']]] : []),
+          ];
+          const ownFilesDisabled = user?.role !== 'admin' && snapshot?.preferences?.effective?.files === false;
           const selectPage = value => {
+            if (['sessions', 'files'].includes(value)) { if (value === 'files' && ownFilesDisabled) return; setContentMode(value); value = 'content'; }
             if (['account', 'preferences', 'usage'].includes(value) || value === 'content' && user?.role !== 'admin') setTab(value);
             else { setTab('admin'); setAdminTab(value); setVisitedAdminTabs(old => ({ ...old, [value]: true })); }
           };
@@ -2270,14 +2785,16 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
             h('style', { style: { display: 'none' } }, styles),
             h('aside', { className: 'lanw-secondary-nav' },
               h('div', { className: 'lanw-sidebar-heading' }, h('h2', { className: 'lanw-window-title' }, t('workspaceEntry')), workspaceActions),
-              h('nav', { 'aria-label': t('workspaceNavigation') }, pages.map(value => actionButton(h(NavigationLabel, { id: value }, t(pageLabels[value])), {
-                key: value, disabled: false, className: 'lanw-secondary-item', id: `lanw-tab-${value}`, 'data-workspace-page': value,
-                ...(['accounts', 'content', 'models', 'sharing', 'branding'].includes(value) && user?.role === 'admin' ? { 'data-admin-tab': value } : {}),
+              h('nav', { 'aria-label': t('workspaceNavigation') }, navigationGroups.map(([id, label, items]) => h('div', { key: id, className: 'lanw-navigation-group', role: 'group', 'aria-labelledby': `lanw-navigation-${id}`, 'data-navigation-group': id },
+                h('span', { id: `lanw-navigation-${id}`, className: 'lanw-navigation-group-title' }, t(label)),
+                items.map(value => actionButton(h(NavigationLabel, { id: value }, t(pageLabels[value])), {
+                key: value, disabled: value === 'files' && ownFilesDisabled, className: 'lanw-secondary-item', id: `lanw-tab-${value}`, 'data-workspace-page': value,
+                ...(['accounts', 'sessions', 'files', 'models', 'sharing', 'branding'].includes(value) && user?.role === 'admin' ? { 'data-admin-tab': value } : {}),
                 'aria-current': currentPage === value ? 'page' : undefined, 'aria-controls': `lanw-panel-${value}`, onClick: () => selectPage(value),
-              })))),
+              })))))),
             h('main', { className: 'lanw-page-main' },
-            h(PageHeading, { level: 'h1', title: t(pageLabels[currentPage]), description: t(currentPage === 'content' && user?.role !== 'admin' ? 'ownContentDescription' : `${currentPage}Description`) }),
-            h('select', { className: 'lanw-section-picker', value: currentPage, 'aria-label': t('workspaceNavigation'), onChange: event => selectPage(event.target.value) }, pages.map(value => h('option', { key: value, value }, t(pageLabels[value])))),
+            h(PageHeading, { level: 'h1', title: t(pageLabels[currentPage]), description: t(['sessions', 'files'].includes(currentPage) && user?.role !== 'admin' ? currentPage === 'files' ? 'ownFilesDescription' : 'ownSessionsDescription' : `${currentPage}Description`) }),
+            h('select', { className: 'lanw-section-picker', value: currentPage, 'aria-label': t('workspaceNavigation'), onChange: event => selectPage(event.target.value) }, navigationGroups.map(([id, label, items]) => h('optgroup', { key: id, label: t(label) }, items.map(value => h('option', { key: value, value, disabled: value === 'files' && ownFilesDisabled }, t(pageLabels[value])))))),
             error && h('div', { className: 'lanw-notice lanw-error', role: 'alert' }, h('strong', null, `${t('backendError')} · ${error.code || 'REQUEST_FAILED'}`), h('p', null, error.message || t('requestFailed'))),
             notice && h('p', { className: 'lanw-notice lanw-success', role: 'status' }, t(notice)),
             !user ? authView() : h('div', { className: 'lanw-content lanw-stack' },
@@ -2291,7 +2808,7 @@ brandingTab: '品牌外观', brandingTitle: '品牌标识', brandingNote: '自�
                 ['account', 'usage'].includes(currentPage) && detailNotice('usage'),
                 h('section', { hidden: activeTab !== 'preferences', id: 'lanw-panel-preferences', 'aria-labelledby': 'lanw-tab-preferences' }, snapshot.preferences ? h(PersonalCapabilities, { key: user.id, value: snapshot.preferences, pending: isBusy, onSave: fields => run('preferences.update', fields), onReload: async () => (await loadSnapshot()).preferences }) : h('p', { className: 'lanw-help' }, t('personalUnavailable'))),
                 user.role === 'admin' && h('div', { hidden: activeTab !== 'admin', className: 'lanw-adminpanel' }, adminView()),
-                user.role !== 'admin' && h('section', { hidden: activeTab !== 'content', id: 'lanw-panel-content', 'aria-labelledby': 'lanw-tab-content' }, h(ContentManager, { users: [user], own: true, fileAccess: snapshot.preferences?.effective?.files !== false, request, active: activeTab === 'content', closeSettings: close, administratorId: user.id, returnPoint: previewReturn?.self && previewReturn.administratorId === user.id ? previewReturn : null, capturePreviewRelease: () => { const session = { ...auth.current }; return previewId => request('member.content', { operation: 'preview.close', previewId }, false, '', session); } })),
+                user.role !== 'admin' && h('section', { hidden: activeTab !== 'content', id: `lanw-panel-${contentMode}`, 'aria-labelledby': `lanw-tab-${contentMode}` }, h(ContentManager, { pageMode: contentMode, onModeChange: setContentMode, users: [user], own: true, fileAccess: snapshot.preferences?.effective?.files !== false, request, active: activeTab === 'content', closeSettings: close, administratorId: user.id, returnPoint: previewReturn?.self && previewReturn.administratorId === user.id ? previewReturn : null, capturePreviewRelease: () => { const session = { ...auth.current }; return previewId => request('member.content', { operation: 'preview.close', previewId }, false, '', session); } })),
                 activeTab === 'usage' ? h('section', { id: 'lanw-panel-usage', 'aria-labelledby': 'lanw-tab-usage' }, usageView()) : null))));
         }
 

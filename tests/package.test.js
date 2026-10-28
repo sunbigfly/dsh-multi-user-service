@@ -14,7 +14,7 @@ test('bundle manifest exports shipped runtime, localized display metadata and an
   assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml');
   assert.equal(pkg.dsh.client.platform, 'web');
   assert.equal(pkg.dsh.client.immediately, true);
-  for (const key of ['.', './client', './icon', './locale/*.json']) assert.equal(typeof pkg.exports[key], 'string');
+  for (const key of ['.', './client', './icon', './locale/*.json', './cli-tools', './cli-tools/icon', './cli-tools/locale/*.json', './tool-origins/icon', './tool-origins/locale/*.json']) assert.equal(typeof pkg.exports[key], 'string');
   assert.equal(pkg.scripts.preinstall, undefined);
   assert.equal(pkg.scripts.postinstall, undefined);
   for (const file of ['index.js', 'http.js', 'domain-store.js', 'client.js', 'core/service.js', 'core/validation.js', 'core/errors.js', 'core/lifecycle.js', 'core/store.js', 'cordis.patch.yml', 'locale/en.json', 'locale/zh.json', 'assets/logo-icon.png', 'README.md', 'CONTRACT.md', 'LICENSE']) {
@@ -26,7 +26,16 @@ test('bundle manifest exports shipped runtime, localized display metadata and an
     assert.ok(metadata.meta.title.length > 5);
     assert.ok(metadata.meta.description.length > 30);
     assert.equal(/decoration|blue circle/i.test(JSON.stringify(metadata)), false);
+    for (const component of ['tool-origins', 'cli-tools']) {
+      const file = pkg.exports[`./${component}/locale/*.json`].replace('*', locale);
+      const display = JSON.parse(await text(file)).meta;
+      assert.ok(display.title && display.description, `${component} needs localized display metadata`);
+      assert.ok((await fs.stat(path.join(root, pkg.exports[`./${component}/icon`]))).isFile());
+    }
   }
+  assert.ok(pkg.files.includes('locale/cli-tools/*.json'));
+  assert.ok(pkg.files.includes('!carrier/execution-native.mjs'), 'the paused browser bridge is not a shipped runtime');
+  assert.doesNotMatch(await text('carrier/execution-catalog.mjs'), /from ['"]\.\/execution-native\.mjs['"]/);
   const icon = await fs.readFile(path.join(root, 'assets/logo-icon.png'));
   assert.ok(icon.byteLength < 256 * 1024);
   assert.deepEqual([...icon.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
@@ -48,13 +57,13 @@ test('client is a classic JavaScript bundle that parses without loading or emula
   assert.equal(/localStorage\??\.setItem\([^\n]*(?:password|bearer|auth\.current|JSON\.stringify\(result)/i.test(source), false);
 });
 
-test('bundle keeps its own entry identities and the native tool-origin startup dependency', async () => {
+test('patch only inserts its additive pilot without overriding existing profile rows', async () => {
   const patch = await text('cordis.patch.yml');
   assert.match(patch, /- insert:/);
   assert.match(patch, /id: multi-user-service/);
   assert.match(patch, /- id: tools\n  inject:\n    - lanToolOrigins\n/);
   assert.deepEqual([...patch.matchAll(/name: '([^']+)'/g)].map(match => match[1]), [
-    '@sunbigfly/dsh-multi-user-service/tool-origins', '@sunbigfly/dsh-multi-user-service',
+    '@sunbigfly/dsh-multi-user-service/tool-origins', '@sunbigfly/dsh-multi-user-service', '@sunbigfly/dsh-multi-user-service/cli-tools',
   ]);
   assert.equal(/override:|disabled:|!!js|\binclude:/.test(patch), false);
 });

@@ -4,6 +4,8 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { publicMemberAccessFixture } from '../verification/public-member-access.mjs';
+import { memberAccessPolicy } from '../carrier/access.mjs';
+import { pathToFileURL } from 'node:url';
 
 const modules = process.env.DSH_LAN_CONTRACT_MODULES;
 
@@ -24,6 +26,53 @@ const denied = (promise, action) => assert.rejects(promise, error => {
   assert.equal(error.code, 'remote-access/denied', `expected remote-access/denied, received ${error.code}: ${error.message}`);
   assert.match(error.message, new RegExp(`remote access: ${action}: access denied`));
   return true;
+});
+
+test('native forwarded session events update members without refresh and remain scoped to ownership', { skip: !modules, timeout: 60000 }, async t => {
+  const host = await fixture({ memberPolicy: false });
+  t.after(async () => { await host.close(); await fs.rm(host.directory, { recursive: true, force: true }); });
+  let owned = ['alice-session'];
+  const removePolicy = host.host.remoteAccess.registerPolicy('lan-member', memberAccessPolicy({
+    sessionIdsOf: userId => userId === 'alice' ? owned : ['bob-session'],
+  }));
+  const Remotes = await import(pathToFileURL(path.join(modules, '@deepseek-ai/dsh-api-remotes/lib/index.js')).href);
+  const events = host.host.plugin(Remotes);
+  await events.await();
+  const controller = new AbortController();
+  const stream = await host.host.typertGateway.wireStream.open('$events', { args: {} }, (async function* () {})(), host.peer('alice'), controller.signal);
+  const iterator = stream[Symbol.asyncIterator]();
+  t.after(async () => { controller.abort(); await iterator.return(); await events.dispose(); removePolicy(); });
+  assert.equal((await iterator.next()).value.type, 'ready');
+  const next = async () => {
+    let timer;
+    try {
+      return await Promise.race([
+        iterator.next(),
+        new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Session event was not delivered')), 2000); }),
+      ]);
+    } finally { clearTimeout(timer); }
+  };
+  // Events from another member and global credential events must not leak.
+  host.host.emit('api-session/status', 'bob-session', true);
+  host.host.emit('credentials/record-updated', 'private-record');
+  for (const running of [true, false]) {
+    host.host.emit('api-session/status', 'alice-session', running);
+    assert.deepEqual((await next()).value, { type: 'emit', event: 'api-session/status', args: ['alice-session', running] });
+  }
+  for (const [event, args] of [
+    ['api-session/activity', ['alice-session', 123456789]],
+    ['api-session/added', [{ sessionId: 'alice-session' }]],
+    ['api-session/error', ['alice-session', 'test error']],
+    ['api-session/removed', ['alice-session']],
+  ]) {
+    host.host.emit(event, ...args);
+    assert.deepEqual((await next()).value, { type: 'emit', event, args });
+  }
+  // Authorization is re-evaluated for an already-connected event stream.
+  owned = ['new-session'];
+  host.host.emit('api-session/status', 'alice-session', true);
+  host.host.emit('api-session/status', 'new-session', true);
+  assert.deepEqual((await next()).value.args, ['new-session', true]);
 });
 
 test('one running Host: a lan-member Peer reads and is denied through the original Gateway, RemoteAccess, SessionController and Sessions services', { skip: !modules, timeout: 60000 }, async t => {

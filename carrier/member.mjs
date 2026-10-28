@@ -325,8 +325,8 @@ export async function createMemberCarrier(ctx, { auth, frontendDist, memberOrigi
   ].map(method => `pluginManager/${method}`));
   // Scheduled tasks live in one Host table and are answered on the Host's
   // authority, but every task names the Session it prompts. A member only ever
-  // reaches the tasks of its own Sessions: calls naming a Session are refused
-  // unless the member owns it, and the catalog is filtered down to those
+  // manages the tasks of its own Sessions. A current preview lease additionally
+  // permits only a stored list read; the catalog is filtered down to owned
   // Sessions. An owner task would otherwise let a member rewrite the prompt an
   // owner Agent runs with the full Host toolset.
   const HOST_SURFACE_ENDPOINTS = new Set([
@@ -519,7 +519,10 @@ async function dispatchApi(request, url, endpoint, current, peer) {
     if (SCHEDULE_SESSION_ENDPOINTS.has(endpoint)) {
       const sessionId = envelopeOf(payload)?.payload?.args?.request?.sessionId;
       const owner = typeof ownership?.ownerOf === 'function' ? ownership.ownerOf(sessionId) : undefined;
-      if (owner !== current.user.id) bad('MEMBER_SCHEDULE_DENIED', 'Members may only manage tasks of their own sessions', 403);
+      // A conversation preview includes stored reminder reads, never task
+      // mutation. Reuse the exact login-bound lease used by the file reader.
+      const previewRead = endpoint === 'schedule/list' && typeof sessionId === 'string' && typeof previews?.fileRoot(peer?.principal, sessionId) === 'string';
+      if (owner !== current.user.id && !previewRead) bad('MEMBER_SCHEDULE_DENIED', 'Only owned sessions allow reminder management; previews are read-only', 403);
     }
     let modelSettings = false;
     if (MODEL_SETTINGS_ENDPOINTS.has(endpoint) && !adminConfiguration) {

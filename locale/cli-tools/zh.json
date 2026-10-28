@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "执行工具",
+    "description": "登记服务器 CLI 与 tool-runner 工具，为多用户服务提供按账号授权的命令、依赖和操作目录。"
+  }
+}

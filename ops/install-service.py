@@ -46,6 +46,7 @@ def ensure_profile(root, profile):
         raise SystemExit('The existing lan profile is not a DSH profile; it was left unchanged. Select or repair the profile before installing.')
     name = json.loads((root / 'package.json').read_text())['name']
     legacy = {
+        '@sunbigfly/dsh-multi-user-service': '@local/dsh-lan-workspace',
         '@sunbigfly/dsh-multi-user-service': '@sunbigfly/dsh-lan-workspace',
     }.get(name)
     if legacy and (legacy in bundles or legacy in package.get('dependencies', {})):

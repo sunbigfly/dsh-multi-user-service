@@ -66,6 +66,10 @@ export const MEMBER_SESSION_ACTIONS = Object.freeze([
   'session/attachment', 'session/cancel', 'session/control', 'session/follow',
   'session/fork', 'session/modelCatalog', 'session/page', 'session/projections',
   'session/prompt', 'session/rename', 'session/selectModel', 'session/updateQueue',
+  // The native client updates running/activity state from forwarded events.
+  // Gateway checks these separately from RPCs, against the same owned Session.
+  'event:api-session/status', 'event:api-session/activity',
+  'event:api-session/added', 'event:api-session/removed', 'event:api-session/error',
   'agentPresets/select',
   'commands/list', 'commands/execute',
   'skills/list',

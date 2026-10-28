@@ -139,6 +139,8 @@ export async function createHostIntegration(ctx, { mountMembers = mountMemberHos
     const facade = {
       restoreLogin: (token, audience) => awaitCurrent(() => service.restoreLogin(token, audience)),
       async execute(args, caller) {
+        if (args.action === 'admin.cliTools') return awaitCurrent(() => members.manageCliTools(args, caller));
+        if (['browser.available', 'browser.operate'].includes(args.action)) return awaitCurrent(() => members.operateBrowser(args, caller));
         args = members.prepareRequest?.(args) ?? args;
         await awaitCurrent(() => updateProviders({ background: !requiresModelCatalog(args.action) }));
         if (args.action === 'admin.completeSetup') return awaitCurrent(() => members.completeSetup(args, caller));

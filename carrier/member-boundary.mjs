@@ -11,6 +11,11 @@ const PUBLIC_RUNTIME = ['/usr', '/bin', '/sbin', '/lib', '/lib64', '/etc/ld.so.c
 const PUBLIC_ENV = /^(?:PATH|LANG|LANGUAGE|LC_[A-Z_]+|TZ|TERM|COLORTERM|SHELL|USER|LOGNAME|HOSTNAME|DSH_SESSION_ID|DSH_PTC_RUNTIME_NODE|ELECTRON_RUN_AS_NODE)$/;
 const SCOPED_NATIVE_TOOLS = new Set(['bash', 'pwsh', 'fs', 'fs-search', 'working-directory', 'terminal', 'ask-user', 'subagent', 'subagent-control', 'todo', 'web', 'goal', 'jobs', 'schedule', 'workflow', 'skill'].map(name => '@deepseek-ai/dsh-tool-' + name));
 SCOPED_NATIVE_TOOLS.add('@deepseek-ai/dsh-ptc-runtime-node');
+// The account plugin exposes read-only status. The independent browser keeps
+// its own mount/PID namespace and pipe-only debugger transport.
+SCOPED_NATIVE_TOOLS.add('@sunbigfly/dsh-multi-user-service');
+SCOPED_NATIVE_TOOLS.add('@sunbigfly/dsh-multi-user-service');
+SCOPED_NATIVE_TOOLS.add('dsh-browser');
 
 // Shared MCP processes and arbitrary plugin implementations can bypass the
 // scoped native filesystem/subprocess services. A grant is not proof of isolation.
@@ -48,7 +53,13 @@ export async function createMemberBoundary({ runtimePaths = [], native, platform
     const temp = join(home, '.tmp');
     try { mkdirSync(temp, { mode: 0o700 }); } catch (error) { if (error.code !== 'EEXIST') throw error; }
     if (!lstatSync(temp).isDirectory() || lstatSync(temp).isSymbolicLink() || canonical(temp) !== temp) failure('MEMBER_BOUNDARY_DENIED', 'The private temporary directory is unsafe.');
-    return { home, temp, shared };
+    const cli = (binding.cli?.readOnlyPaths ?? []).map(canonical);
+    const managedCli = binding.cli?.bin ? canonical(dirname(binding.cli.bin)) : undefined;
+    if (cli.some(root => (binding.protectedRoots ?? []).some(protectedRoot => (inside(root, protectedRoot) || inside(protectedRoot, root))
+      && !(managedCli && inside(managedCli, root))))) failure('MEMBER_BOUNDARY_DENIED', 'CLI runtimes cannot expose server state or another account directory.');
+    if (cli.some(root => inside(home, root) || inside(root, home))) failure('MEMBER_BOUNDARY_DENIED', 'CLI programs must remain outside writable member directories.');
+    if (cli.some(root => shared.some(row => row.mode === 'read-write' && (inside(root, row.path) || inside(row.path, root))))) failure('MEMBER_BOUNDARY_DENIED', 'CLI programs must remain outside writable shared directories.');
+    return { home, temp, shared, cli };
   };
   const confine = (argv, binding, mode = 'workspace-write') => {
     const roots = grantsFor(binding);
@@ -56,9 +67,9 @@ export async function createMemberBoundary({ runtimePaths = [], native, platform
     // A redundant child grant under a writable parent could be swapped for a
     // symlink between validation and launcher startup. Grant only stable roots.
     const readWrite = minimal(['/dev/null', ...(mode === 'read-only' ? [] : [roots.home, ...roots.shared.filter(row => row.mode === 'read-write').map(row => row.path)])]);
-    const readOnly = minimal([...runtimeRoots, roots.home, ...roots.shared.map(row => row.path)]).filter(path => !readWrite.some(parent => inside(parent, path)));
+    const readOnly = minimal([...runtimeRoots, ...roots.cli, roots.home, ...roots.shared.map(row => row.path)]).filter(path => !readWrite.some(parent => inside(parent, path)));
     const wrapped = [sdk.launcherPath(), ...sdk.grantArgs({ readOnly, readWrite }), '--', ...argv];
-    prepared.set(wrapped, { userId: binding.userId, home: roots.home, shared: JSON.stringify(roots.shared), mode });
+    prepared.set(wrapped, { userId: binding.userId, home: roots.home, shared: JSON.stringify(roots.shared), cli: JSON.stringify(roots.cli), mode });
     return { argv: wrapped, enforcement: 'full', denialSignatures: ['permission denied', 'operation not permitted'], runnerFailureRules: [{ allowedExitCodes: [sdk.LAUNCHER_FAILURE_EXIT], fatalSignatures: ['landlock-run:'] }] };
   };
   const prepare = (spec, binding, terminal = false) => {
@@ -66,14 +77,14 @@ export async function createMemberBoundary({ runtimePaths = [], native, platform
     const cwd = canonical(spec.cwd);
     if (!inside(roots.home, cwd) && !roots.shared.some(row => inside(row.path, cwd))) failure('MEMBER_BOUNDARY_DENIED', 'Execution is outside the personal and authorized shared directories.');
     const saved = prepared.get(spec.argv);
-    const reuse = saved?.userId === binding.userId && saved.home === roots.home && saved.shared === JSON.stringify(roots.shared);
+    const reuse = saved?.userId === binding.userId && saved.home === roots.home && saved.shared === JSON.stringify(roots.shared) && saved.cli === JSON.stringify(roots.cli);
     const env = Object.fromEntries(Object.keys(process.env).filter(key => !PUBLIC_ENV.test(key)).map(key => [key, undefined]));
     for (const [key, value] of Object.entries(spec.env ?? {})) {
       if (PUBLIC_ENV.test(key) || key === 'NODE_OPTIONS' && /^--max-old-space-size=\d+$/.test(value ?? '')) env[key] = value;
     }
     Object.assign(env, { HOME: roots.home, DSH_HOME: join(roots.home, '.dsh'), TMPDIR: roots.temp, TMP: roots.temp, TEMP: roots.temp, PWD: cwd,
       XDG_CONFIG_HOME: join(roots.home, '.config'), XDG_CACHE_HOME: join(roots.home, '.cache'), XDG_DATA_HOME: join(roots.home, '.local/share'), XDG_STATE_HOME: join(roots.home, '.local/state'),
-      PATH: [join(roots.home, '.local/bin'), dirname(process.execPath), '/usr/local/bin', '/usr/bin', '/bin'].join(':') });
+      PATH: [binding.cli?.bin, join(roots.home, '.local/bin'), dirname(process.execPath), '/usr/local/bin', '/usr/bin', '/bin'].filter(Boolean).join(':') });
     return { ...spec, cwd, argv: reuse ? spec.argv : confine(spec.argv, binding).argv, env, ...(terminal ? { shellActivity: false } : {}) };
   };
   return { assertAvailable, confine, prepare, snapshot: () => ({ enforced: true, available, backend: 'dsh-native-landlock', sharedHostToolsBlocked: true }) };
@@ -82,7 +93,7 @@ export async function createMemberBoundary({ runtimePaths = [], native, platform
 /** Wrap every native instance, including Agent-preset-local providers. Calls on
  * the trusted owner path keep the exact native argv, environment and handles.
  */
-export function installMemberBoundary(receiver, { boundary, bindingForPolicy, bindingForExecution, kind, trusted = true }) {
+export function installMemberBoundary(receiver, { boundary, bindingForPolicy, bindingForExecution, prepareBinding, preparedBinding, kind, trusted = true }) {
   const service = originalOf(receiver), restores = [];
   const methods = kind === 'sandbox' ? ['confine'] : ['spawn', 'spawnTerminal'];
   for (const name of methods) {
@@ -93,11 +104,19 @@ export function installMemberBoundary(receiver, { boundary, bindingForPolicy, bi
       if (!binding) return original.call(this, argv, policy, signal);
       if (!trusted) failure('MEMBER_BOUNDARY_UNAVAILABLE', 'This sandbox provider has no verified member directory boundary.');
       signal?.throwIfAborted();
-      return Promise.resolve(boundary.confine(argv, binding, policy.mode));
+      return Promise.resolve(prepareBinding ? prepareBinding(binding) : binding).then(value => {
+        signal?.throwIfAborted();
+        return boundary.confine(argv, value, policy.mode);
+      });
     } : function(spec) {
       const binding = bindingForExecution(spec);
       if (binding && !trusted) failure('MEMBER_BOUNDARY_UNAVAILABLE', 'This subprocess provider has no verified member directory boundary.');
-      return original.call(this, binding ? boundary.prepare(spec, binding, name === 'spawnTerminal') : spec);
+      if (!binding) return original.call(this, spec);
+      // DSH spawn returns its handle synchronously; only terminal allocation
+      // may await preparation. Never turn native handles into Promises.
+      if (name === 'spawn') return original.call(this, boundary.prepare(spec, preparedBinding ? preparedBinding(binding) : binding));
+      if (!prepareBinding) return original.call(this, boundary.prepare(spec, binding, name === 'spawnTerminal'));
+      return Promise.resolve(prepareBinding(binding)).then(value => original.call(this, boundary.prepare(spec, value, name === 'spawnTerminal')));
     };
     service[name] = wrapped;
     restores.push(() => { if (service[name] === wrapped) { if (descriptor) Object.defineProperty(service, name, descriptor); else delete service[name]; } });

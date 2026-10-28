@@ -10,6 +10,7 @@ import { MemberOwnership, memberAccessPolicy, memberToolAllow, memberToolDenial,
 import { memberBootRows, memberClientGraph, MEMBER_BOOT_GLOBAL, MEMBER_READY_MARKUP } from '../carrier/member-boot.mjs';
 import { MemberAttachmentAccess } from '../carrier/attachments.mjs';
 import { nativeMemberSessions } from '../carrier/native-sessions.mjs';
+import { AdministratorPreviews } from '../carrier/admin-previews.mjs';
 
 const ORIGIN = 'http://localhost:59844', OWNER = 'http://127.0.0.1:59844';
 const TOKEN = 'a'.repeat(43), CSRF = 'b'.repeat(43);
@@ -52,6 +53,7 @@ async function fixture(t, options = {}) {
     if (args.action === 'logout') return { ok: true };
     throw new Error('unexpected core action');
   } };
+  if (options.restoreLogin) core.restoreLogin = options.restoreLogin;
   const auth = new MemberSessions({ core, origin: ORIGIN, ownerOrigin: OWNER });
   const respond = options.respond ?? (() => new Response(JSON.stringify({ type: 'server-response', result: { ok: true, value: {} } }), { headers: { 'content-type': 'application/json' } }));
   const ctx = {
@@ -123,6 +125,17 @@ test('LAN administrator manages native provider configuration on the Host author
   const before = f.dispatches.length;
   const rejected = await f.carrier.handle(f.request('/lan/api/credentials/set', { method: 'POST', headers: { 'content-type': 'application/json' }, body: envelope('credentials/set', {}) }));
   assert.equal(rejected.status, 403); assert.equal(f.dispatches.length, before);
+});
+
+test('only administrators can save the shared browser display settings',async t=>{
+  for(const role of ['admin','member']){
+    const f=await fixture(t,{user:{role}});await f.login();
+    const args={ns:'browser',ops:[{op:'set',path:['remoteQuality'],value:6}],expectedRevision:1};
+    const response=await f.carrier.handle(f.request('/lan/api/settings/mutate',{method:'POST',headers:{'content-type':'application/json','x-lan-csrf':CSRF},body:envelope('settings/mutate',args)}));
+    assert.equal(response.status,role==='admin'?200:403);
+    if(role==='admin')assert.equal(f.dispatches.at(-1).peer.principal.kind,'owner');
+    else assert.equal(f.dispatches.length,0,'member edits must never reach the shared Host configuration');
+  }
 });
 
 test('plugin inventory preserves the real Host management flag only for LAN administrators', async t => {
@@ -691,6 +704,29 @@ test('member Host-authority reads stay inside the member: file paths and schedul
   assert.deepEqual(listed.result.value.map(item => item.id), ['t1']);
   const redirect = await post('llm/discoverModels', { settingsNs: 'llm-pi-ai', request: { provider: 'host', baseURL: 'https://attacker.example' } });
   assert.equal(redirect.status, 403);
+});
+
+test('administrator reminder preview reads require the exact current lease and never permit mutations', async t => {
+  const ownership = await new MemberOwnership({ store: ownershipStore() }).start();
+  await ownership.record({ userId: OTHER, sessionId: 'foreign-reminders', projectId: 'workspace', cwd: '/members/other/workspace' });
+  let administrator = true;
+  const previews = new AdministratorPreviews({ ownership, core: {
+    restoreLogin: async () => ({ user: { id: USER.id, role: 'admin' }, expiresAt: Date.now()+60000 }),
+    memberIsAdministrator: () => administrator,
+  } });
+  t.after(()=>previews.close());
+  const f = await fixture(t,{ownership,previews,user:{role:'admin'},restoreLogin:async()=>({user:{...USER,role:'admin'},csrf:CSRF,expiresAt:Date.now()+60000})});await f.login();
+  const post = (endpoint,sessionId='foreign-reminders')=>f.carrier.handle(f.request('/lan/api/'+endpoint,{method:'POST',headers:{'content-type':'application/json','x-lan-csrf':CSRF},body:envelope(endpoint,{request:{sessionId,id:'task-id'}})}));
+  assert.equal((await post('schedule/list')).status,403);
+  const caller={token:TOKEN,audience:'member'};
+  const lease=await previews.open({user:{id:OTHER,displayName:'Other'},root:'/members/other',sessionId:'foreign-reminders'},caller,[]);
+  const read = await post('schedule/list');
+  assert.equal(read.status,200,JSON.stringify(await read.json()));
+  assert.equal(f.dispatches.at(-1).peer.principal.kind,'owner');
+  assert.equal((await post('schedule/list','unleased-session')).status,403);
+  for(const endpoint of ['schedule/delete','schedule/update','schedule/history'])assert.equal((await post(endpoint)).status,403);
+  administrator=false;assert.equal((await post('schedule/list')).status,403);
+  administrator=true;previews.release(lease.previewId,caller);assert.equal((await post('schedule/list')).status,403);
 });
 
 test('native ZIP export authorizes the root and every requested descendant before forwarding', async t => {

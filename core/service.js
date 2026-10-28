@@ -62,7 +62,11 @@ const publicUser = (user) => {
 };
 const preferenceView = user => {
   const granted = accountAccess(user.access), selection = v.personalAccess(user.preferences);
-  for (const key of v.ACCESS_LISTS) if (granted[key] !== null && selection[key] !== null) selection[key] = selection[key].filter(id => granted[key].includes(id));
+  for (const key of v.ACCESS_LISTS) {
+    if (key === 'tools') {
+      if (selection.toolMode === 'whitelist') selection.tools = selection.tools.filter(id => v.toolAccessAllows(granted, id));
+    } else if (granted[key] !== null && selection[key] !== null) selection[key] = selection[key].filter(id => granted[key].includes(id));
+  }
   return { revision: user.preferencesRevision ?? 0, selection, granted, effective: v.effectiveAccess(user) };
 };
 const inviteStatus = (invite, now) => invite.usedAt !== undefined ? 'used' : invite.revokedAt !== undefined ? 'revoked' : invite.expiresAt <= now ? 'expired' : 'pending';
@@ -554,7 +558,11 @@ export class LanService {
           v.integer(request.expectedRevision, 'preferences revision');
           if (request.expectedRevision !== (auth.user.preferencesRevision ?? 0)) reject('PREFERENCES_CONFLICT', 'Personal preferences changed. Reload before saving.', 409);
           const access = v.personalAccess(request.access), granted = accountAccess(auth.user.access);
-          for (const key of v.ACCESS_LISTS) if (granted[key] !== null && access[key]?.some(id => !granted[key].includes(id))) reject('FORBIDDEN', 'A personal selection exceeds the administrator grant.', 403);
+          for (const key of v.ACCESS_LISTS) {
+            if (key === 'tools') {
+              if (access.toolMode === 'whitelist' && access.tools.some(id => !v.toolAccessAllows(granted, id))) reject('FORBIDDEN', 'A personal selection exceeds the administrator grant.', 403);
+            } else if (granted[key] !== null && access[key]?.some(id => !granted[key].includes(id))) reject('FORBIDDEN', 'A personal selection exceeds the administrator grant.', 403);
+          }
           return this.#commit(state => {
             const user = state.users.find(row => row.id === auth.user.id);
             user.preferences = access; user.preferencesRevision = (user.preferencesRevision ?? 0) + 1;
@@ -738,7 +746,7 @@ export class LanService {
               const preferred = request.defaultRouteId === undefined ? (ids.includes(user.defaultRouteId) ? user.defaultRouteId : null) : request.defaultRouteId;
               Object.assign(fields, this.#policy(ids, preferred), { modelAccess: v.modelAccess(request.modelAccess ?? (request.routeIds === undefined ? modelAccessOf(user) : 'custom')) });
             }
-            if (request.access !== undefined) fields.access = accountAccess({ ...accountAccess(user.access), ...request.access });
+            if (request.access !== undefined) fields.access = v.mergeAccountAccess(user.access, request.access);
             return fields;
           });
           const result = await this.#commit(state => {
@@ -768,7 +776,7 @@ export class LanService {
           const defaultId = request.defaultRouteId === undefined ? (ids.includes(user.defaultRouteId) ? user.defaultRouteId : null) : request.defaultRouteId;
           const policy = { ...this.#policy(ids, defaultId), modelAccess: v.modelAccess(request.modelAccess ?? (request.routeIds === undefined ? modelAccessOf(user) : 'custom')) };
           if (request.access !== undefined) v.object(request.access, v.ACCESS_FIELDS, []);
-          const access = accountAccess({ ...accountAccess(user.access), ...request.access });
+          const access = v.mergeAccountAccess(user.access, request.access);
           if (disabled || role !== user.role) await this.#revoke(user.id);
           const result = await this.#commit((state) => {
             const target = state.users.find((candidate) => candidate.id === user.id);

@@ -1,10 +1,12 @@
 # 兼容性与上架验证
 
+当前 v0.1.1 源码的检查见 [2026-10-28 完整性检查](completeness-2026-10-28.md)。下文的第三方商城解析与安装生命周期记录来自先前 v0.1.0 发行版；本次源码同步没有重新确认第三方商城准入状态。
+
 本发行版支持 DSH **0.2.1-rc.2**、Node.js **22+**、Linux / WSL 服务端及 `web` Profile。`package.json` 的 `engines.dsh` 保持精确版本；`dsh.compatibility.dshReleases` 仅将 rc.2 声明为 `compatible`，未验证的 rc.1、rc.3 声明为 `unknown`，不授权其安装。
 
 ## Bundle 与权限
 
-- 包内声明 `dsh.bundle.patch: ./cordis.patch.yml`，插入的两个入口均属于本包：`multi-user-tool-origins` 和 `multi-user-service`。
+- 包内声明 `dsh.bundle.patch: ./cordis.patch.yml`，插入的三个入口均属于本包：`multi-user-tool-origins`、`multi-user-service` 和 `member-cli-tools`。三者均提供中英文名称、简介与图标。
 - 不安装替代的官方组件，不改变官方入口的包名、实现、配置或启用状态。
 - `tools` 入口仅追加 `lanToolOrigins` 服务依赖。它让本插件先记录工具注册的真实 Loader 来源，再启动原生工具及其提供者；成员授权按来源和执行时的账号权限共同校验。不能通过删除这项依赖来获得商城通过状态。
 - 工具来源记录器的安装、销毁均由 Cordis effect 管理；卸载时恢复原有注册函数。无法证明来源隔离的工具不向成员开放。

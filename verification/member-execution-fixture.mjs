@@ -7,7 +7,7 @@ import { installMemberFileRanges } from '../carrier/file-ranges.mjs';
 import { createMemberBoundary, installMemberBoundary } from '../carrier/member-boundary.mjs';
 
 /** Real installed DSH services and native tools; no model/provider is called. */
-export async function memberExecutionFixture({ modules, parent = tmpdir(), ptc = false, ptcConfig = {}, sharedDirectories = [], strict = false }) {
+export async function memberExecutionFixture({ modules, parent = tmpdir(), ptc = false, ptcConfig = {}, sharedDirectories = [], strict = false, prepareBinding, preparedBinding, search = false }) {
   const load = name => import(pathToFileURL(join(modules, '@deepseek-ai', name, 'lib/index.js')).href);
   const [{ Context }, { createScope, scopeParentOf }] = await Promise.all(['cordis', 'dsh-scope'].map(load));
   const directory = await mkdtemp(join(parent, 'dsh-member-execution-'));
@@ -53,12 +53,13 @@ export async function memberExecutionFixture({ modules, parent = tmpdir(), ptc =
       presetScope = createScope(ctx, preset);
       await mount('dsh-tool-fs', { readImage: false }, presetScope.ctx);
       await mount('dsh-tool-bash', { enableRunInBackground: false, promoteOnTimeout: false }, presetScope.ctx);
+      if (search) await mount('dsh-tool-fs-search', { sampleOverCapGlobResults: false }, presetScope.ctx);
       memberScope = createScope(ctx, agent, { parent: preset }); agent.ctx = memberScope.ctx; agent.scope = memberScope;
       const scope = agent.ctx, allowed = null;
       if (strict) {
         const boundary = await createMemberBoundary({ native: await load('node-addon-system'), runtimePaths: [modules] });
         const binding = () => ({ userId, home, cwd, sharedDirectories });
-        const options = { boundary, bindingForPolicy: policy => policy.workspaceRoot === cwd ? binding() : undefined,
+        const options = { boundary, prepareBinding, preparedBinding, bindingForPolicy: policy => policy.workspaceRoot === cwd ? binding() : undefined,
           bindingForExecution: spec => spec.cwd === home || spec.cwd === cwd || spec.cwd?.startsWith(cwd + '/') ? binding() : undefined };
         for (const name of ['sandbox', 'subprocess']) scope.effect(() => installMemberBoundary(ctx.get(name), { ...options, kind: name }));
       }

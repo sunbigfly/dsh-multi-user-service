@@ -97,6 +97,15 @@ test('real native tools inherit newly registered capabilities; current account g
   await f.update({ tools: null });
   assert.match(capabilities.toolDenial({ agent, name: 'plugin_manager', arguments: { action: 'install_bundle' } }, 'workspace-write'), /administrator/);
   assert.equal(capabilities.toolDenial({ agent, name: 'plugin_manager', arguments: { action: 'list_plugins' } }, 'workspace-write'), undefined);
+  await f.update({ toolMode: 'blacklist', tools: ['new_shared_plugin_tool'] });
+  const beforeBlacklist = calls;
+  await run('new_shared_plugin_tool'); assert.equal(calls, beforeBlacklist);
+  await run('local_agent_tool'); assert.equal(calls, beforeBlacklist + 1);
+  register(ctx, 'future_default_tool');
+  await run('future_default_tool'); assert.equal(calls, beforeBlacklist + 2, 'new tools are allowed by default in blacklist mode');
+  await f.update({ toolMode: 'whitelist', tools: ['local_agent_tool'] });
+  await run('future_default_tool'); assert.equal(calls, beforeBlacklist + 2);
+  await run('local_agent_tool'); assert.equal(calls, beforeBlacklist + 3);
 });
 
 test('feature switches reject corresponding native API and stream endpoints', async t => {

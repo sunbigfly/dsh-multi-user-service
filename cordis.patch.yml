@@ -6,3 +6,5 @@
       name: '@sunbigfly/dsh-multi-user-service/tool-origins'
     - id: multi-user-service
       name: '@sunbigfly/dsh-multi-user-service'
+    - id: member-cli-tools
+      name: '@sunbigfly/dsh-multi-user-service/cli-tools'

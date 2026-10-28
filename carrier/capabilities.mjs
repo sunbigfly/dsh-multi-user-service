@@ -2,6 +2,7 @@ import { memberToolDenial } from './access.mjs';
 import { resolveSharedDirectories } from './file-ranges.mjs';
 import { realpathSync } from 'node:fs';
 import { memberSourceIsolated } from './member-boundary.mjs';
+import { toolAccessAllows } from '../core/validation.js';
 
 const FILE_TOOLS = new Set(['read', 'read_image', 'write', 'edit', 'glob', 'grep', 'bash', 'run_code', 'working_directory']);
 const SUBAGENT_TOOLS = new Set(['subagent', 'subagent_fork', 'list_agents', 'list_subagent_models', 'send_message', 'interrupt_agent', 'wait_agent']);
@@ -119,7 +120,7 @@ export class MemberCapabilities {
     return true;
   }
   toolAllowed(policy, name, agent) {
-    if (policy.tools !== null && !policy.tools.includes(name)) return false;
+    if (!toolAccessAllows(policy, name)) return false;
     if (!policy.files && FILE_TOOLS.has(name)) return false;
     if (!policy.terminal && name === 'terminal') return false;
     if (!policy.subagents && SUBAGENT_TOOLS.has(name)) return false;

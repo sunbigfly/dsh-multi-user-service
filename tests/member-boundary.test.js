@@ -47,10 +47,16 @@ test('shared MCP and arbitrary plugin code are not mistaken for a member-scoped 
   assert.equal(memberSourceIsolated({ plugin: '@deepseek-ai/dsh-tool-cordis' }), false);
   assert.equal(memberSourceIsolated({ plugin: '@deepseek-ai/dsh-tool-bash' }), true);
   assert.equal(memberSourceIsolated({ plugin: '@deepseek-ai/dsh-ptc-runtime-node' }), true);
+  assert.equal(memberSourceIsolated({ plugin: 'dsh-browser' }), true);
   const access = new MemberCapabilities({}), inherited = { plugins: null, mcpServers: null };
   assert.equal(access.sourceAllowed({ ...inherited, files: false }, { plugin: '@deepseek-ai/dsh-tool-bash' }), false);
   assert.equal(access.sourceAllowed({ ...inherited, files: true }, { plugin: '@deepseek-ai/dsh-tool-fs' }), true);
   assert.equal(access.sourceAllowed({ ...inherited, subagents: false }, { plugin: '@deepseek-ai/dsh-tool-subagent' }), false);
+});
+
+test('CLI runtime grants cannot overlap protected server or other-member state', nativeTest, async t => {
+  const f = await fixture(t);
+  assert.throws(() => f.boundary.confine([process.execPath, '--version'], { ...f.binding, protectedRoots: [f.secret], cli: { readOnlyPaths: [f.secret] } }), { code: 'MEMBER_BOUNDARY_DENIED' });
 });
 
 test('native launcher confines absolute paths, traversal, symlinks, hard links and proc access', nativeTest, async t => {
@@ -132,6 +138,27 @@ test('real native Bash and Node PTC cannot cross the account boundary even in fu
     const result = await runtime.run({ ...spec, sandboxPolicy: policy });
     assert.deepEqual(result.value, { own: 'PTC_OK', outside: false }, JSON.stringify(result));
   }
+});
+
+test('native bash, glob and grep survive asynchronous CLI preparation without widening access', { ...nativeTest, timeout: 30000 }, async t => {
+  let preparations = 0;
+  const f = await memberExecutionFixture({ modules, strict: true, search: true,
+    prepareBinding: async binding => { await Promise.resolve(); preparations++; return binding; } });
+  t.after(() => f.close());
+  await writeFile(join(f.cwd, 'member-note.txt'), 'MEMBER_SEARCH_OK');
+  const bash = await f.run('bash', { description: 'Verify native process handle', command: 'printf HANDLE_OK; if cat ../outside-canary 2>/dev/null; then exit 1; fi' });
+  assert.equal(bash.isError, false, JSON.stringify(bash));
+  assert.equal(bash.value.exitCode, 0, JSON.stringify(bash));
+  assert.match(bash.value.stdout.text, /HANDLE_OK/);
+  assert.ok(preparations > 0);
+  const glob = await f.run('glob', { pattern: '*.txt' });
+  assert.equal(glob.isError, false, JSON.stringify(glob));
+  assert.match(JSON.stringify(glob.content), /member-note\.txt/);
+  const grep = await f.run('grep', { pattern: 'MEMBER_SEARCH_OK' });
+  assert.equal(grep.isError, false, JSON.stringify(grep));
+  assert.match(JSON.stringify(grep.content), /MEMBER_SEARCH_OK/);
+  const denied = await f.run('grep', { pattern: 'synthetic-only', path: f.canary });
+  assert.equal(denied.isError, true, JSON.stringify(denied));
 });
 
 test('the real native PTY remains usable but cannot read another account file', { ...nativeTest, timeout: 30000 }, async t => {

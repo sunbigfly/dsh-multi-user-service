@@ -39,8 +39,8 @@ export function modelAccess(value) {
 }
 
 export const ACCESS_FLAGS = Object.freeze(['terminal', 'files', 'attachments', 'tasks', 'subagents', 'interactions']);
-export const ACCESS_LISTS = Object.freeze(['tools', 'skills', 'agentPresets', 'permissionPresets', 'plugins', 'mcpServers']);
-export const ACCESS_FIELDS = Object.freeze([...ACCESS_FLAGS, ...ACCESS_LISTS, 'sharedDirectories']);
+export const ACCESS_LISTS = Object.freeze(['tools', 'skills', 'agentPresets', 'permissionPresets', 'plugins', 'mcpServers', 'cliTools']);
+export const ACCESS_FIELDS = Object.freeze([...ACCESS_FLAGS, ...ACCESS_LISTS, 'toolMode', 'sharedDirectories']);
 
 export function sharedDirectories(value = []) {
   const seen = new Set();
@@ -69,11 +69,14 @@ export function accountAccess(value = {}) {
       result[key] = [...list].sort();
     }
   }
+  result.toolMode = value.toolMode ?? (Array.isArray(value.tools) ? 'whitelist' : 'blacklist');
+  if (!['blacklist', 'whitelist'].includes(result.toolMode)) reject('INVALID_INPUT', 'Invalid tool access mode.');
+  if (result.toolMode === 'whitelist' && result.tools === null) result.tools = [];
   result.sharedDirectories = sharedDirectories(value.sharedDirectories);
   return result;
 }
 
-export const PREFERENCE_FIELDS = Object.freeze([...ACCESS_FLAGS, ...ACCESS_LISTS]);
+export const PREFERENCE_FIELDS = Object.freeze([...ACCESS_FLAGS, ...ACCESS_LISTS, 'toolMode']);
 export function personalAccess(value = {}) {
   object(value, PREFERENCE_FIELDS, []);
   const normalized = accountAccess(value);
@@ -85,9 +88,26 @@ export function effectiveAccess(user) {
   const granted = accountAccess(user.access), selected = personalAccess(user.preferences);
   for (const key of ACCESS_FLAGS) granted[key] &&= selected[key];
   for (const key of ACCESS_LISTS) {
+    if (key === 'tools') continue;
     if (selected[key] !== null) granted[key] = granted[key] === null ? [...selected[key]] : granted[key].filter(id => selected[key].includes(id));
   }
+  if (granted.toolMode === 'whitelist') granted.tools = granted.tools.filter(name => toolAccessAllows(selected, name));
+  else if (selected.toolMode === 'whitelist') {
+    granted.tools = selected.tools.filter(name => toolAccessAllows(granted, name));
+    granted.toolMode = 'whitelist';
+  } else if (granted.tools !== null || selected.tools !== null) granted.tools = [...new Set([...(granted.tools ?? []), ...(selected.tools ?? [])])].sort();
   return granted;
+}
+
+export function toolAccessAllows(policy, name) {
+  const mode = policy.toolMode ?? (Array.isArray(policy.tools) ? 'whitelist' : 'blacklist');
+  return mode === 'blacklist' ? !policy.tools?.includes(name) : !!policy.tools?.includes(name);
+}
+
+export function mergeAccountAccess(previous, patch = {}) {
+  const current = accountAccess(previous);
+  const toolMode = patch.toolMode ?? (Object.hasOwn(patch, 'tools') ? Array.isArray(patch.tools) ? 'whitelist' : 'blacklist' : current.toolMode);
+  return accountAccess({ ...current, ...patch, toolMode });
 }
 
 export function integer(value, name, minimum = 0) {

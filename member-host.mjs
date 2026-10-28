@@ -1,5 +1,6 @@
-import { realpath } from 'node:fs/promises';
+import { realpath, readFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { installMemberCordis } from './carrier/cordis.mjs';
 import { NativeUsage, nativeUsageRevisions } from './carrier/usage.mjs';
 import { MemberLimits, installMemberLimitAdmission, installMemberLimitPrompt } from './carrier/limits.mjs';
@@ -38,6 +39,10 @@ import { HomeDirectories, createHomeDirectoryController, publicHome } from './ru
 import { createIsolationCheck } from './runtime/isolation-check.mjs';
 import { reject } from './core/errors.js';
 import { resolveHostPackage } from './carrier/host-package.mjs';
+import { browserAuthorization, performBrowserOperation } from './carrier/browser-access.mjs';
+import { pluginOrigin } from './carrier/tool-origins.mjs';
+import { CliManagement } from './carrier/cli-management.mjs';
+import { executionToolsDefinition, runNativeExecutionTool } from './carrier/execution-tools.mjs';
 
 const json = value => new Response(JSON.stringify({ ok: true, result: value }), { headers: { 'content-type': 'application/json', 'cache-control': 'no-store, private', 'x-content-type-options': 'nosniff' } });
 const spec = name => ({ name, version: 1, layout: 'single', tables: { state: { valueSchema: z.json() } } });
@@ -111,10 +116,23 @@ export async function mountMemberHost(ctx, { core, coreStore, hostCapability, up
     const models = new MemberModels({ core, hostCapability, ownership, ctx });
     const runtimePaths = [process.execPath, resolve(dirname(resolveHostPackage('@deepseek-ai/dsh/package.json')), '../..')];
     const dshHome = process.env.DSH_HOME || resolve(homedir(), '.dsh');
-    const protectedRoots = [...['storages', 'sessions', 'attachments', 'profiles', 'settings.yaml', 'cordis.yml', 'auth.json'].map(path => resolve(dshHome, path)), resolve(homedir(), '.local/share/dsh-lan'), resolve(homedir(), '.local/share/dsh-lan-backups'), resolve(homedir(), '.ssh'), resolve(homedir(), '.codex/auth.json'), resolve(homedir(), '.codex/config.toml')];
+    const protectedRoots = [...['storages', 'sessions', 'attachments', 'profiles', 'settings.yaml', 'cordis.yml', 'auth.json', 'cli-tools'].map(path => resolve(dshHome, path)), resolve(homedir(), '.local/share/dsh-lan'), resolve(homedir(), '.local/share/dsh-lan-backups'), resolve(homedir(), '.ssh'), resolve(homedir(), '.codex/auth.json'), resolve(homedir(), '.codex/config.toml')];
     const origins = ctx.get('lanToolOrigins');
     if (!origins) throw new Error('Native tool registration origins are unavailable');
     const capabilities = new MemberCapabilities({ core, hostCapability, ownership, ctx, origins, protectedRoots, readonlyRoots: runtimePaths });
+    const browserAccess = ctx.inject(['workspaceBrowser'], child => child.effect(() => child.workspaceBrowser.registerAccess(browserAuthorization({ core, capabilities, ownership, plugin: child.workspaceBrowser.pluginId }))));
+    cleanup.push(() => browserAccess.dispose());
+    const operateBrowser = async (request, caller) => {
+      const snapshot = await core.execute({ action: 'snapshot', section: 'base' }, caller);
+      const policy = capabilities.policy(snapshot.user.id);
+      const browser = ctx.get('workspaceBrowser');
+      const allowed = !!browser && capabilities.sourceAllowed(policy, { plugin: browser.pluginId }) && capabilities.toolAllowed(policy, 'workspace_browser');
+      if (request.action === 'browser.available') return { available: allowed && !!await browser.available(), ...(allowed && await browser.remoteAvailable?.() ? { remoteAvailable: true } : {}), ...(allowed && browser.desktopDownload ? { desktopDownload: browser.desktopDownload } : {}) };
+      if (!browser) reject('BROWSER_UNAVAILABLE', '请先安装并启用独立的 dsh-browser 插件。', 503);
+      if (!allowed) reject('FORBIDDEN', '未获得浏览器使用权限。', 403);
+      if (Object.keys(request).some(key => !['action', 'sessionId', 'input'].includes(key))) reject('INVALID_INPUT', '浏览器参数无效。');
+      return performBrowserOperation(browser, request.sessionId, request.input, { caller });
+    };
     executionBoundary = await createMemberBoundary({ runtimePaths });
     const resourceBindings = new Map();
     cleanup.push(() => { for (const restore of resourceBindings.values()) restore(); resourceBindings.clear(); });
@@ -157,14 +175,27 @@ export async function mountMemberHost(ctx, { core, coreStore, hostCapability, up
       const home = memberHome(binding);
       return { ...binding, home, sharedDirectories: capabilities.directories(userId), protectedRoots: [...protectedRoots, ...ownership.privateRoots().filter(root => root !== home)] };
     };
-    const executionBindings = new Map();
+    const executionBindings = new Map(), executionToolRuntime = new AsyncLocalStorage();
+    const withExecutionPaths = (binding, cli) => {
+      const runtime = executionToolRuntime.getStore();
+      if (runtime?.userId === binding.userId) cli = { ...cli, readOnlyPaths: [...new Set([...(cli?.readOnlyPaths ?? []), ...runtime.paths])] };
+      return { ...binding, cli };
+    };
+    const preparedBinding = binding => withExecutionPaths(binding,
+      ctx.get('lanCliTools')?.snapshot(binding.userId, capabilities.policy(binding.userId)));
+    const prepareBinding = async binding => {
+      const policy = capabilities.policy(binding.userId);
+      const cli = await ctx.get('lanCliTools')?.prepare(binding.userId, policy);
+      if (JSON.stringify(capabilities.policy(binding.userId).cliTools) !== JSON.stringify(policy.cliTools)) reject('MEMBER_EXECUTION_DENIED', 'CLI permissions changed; retry with the current permissions.', 403);
+      return withExecutionPaths(binding, cli);
+    };
     cleanup.push(() => { for (const restore of executionBindings.values()) restore(); executionBindings.clear(); });
     const ensureExecutionContext = context => {
       for (const name of ['sandbox', 'subprocess']) {
         const service = context.get(name);
         if (!service) continue;
         const original = service[Symbol.for('cordis.original')] ?? service;
-        if (!executionBindings.has(original)) executionBindings.set(original, installMemberBoundary(service, { boundary: executionBoundary, bindingForPolicy, bindingForExecution, kind: name,
+        if (!executionBindings.has(original)) executionBindings.set(original, installMemberBoundary(service, { boundary: executionBoundary, bindingForPolicy, bindingForExecution, prepareBinding, preparedBinding, kind: name,
           trusted: origins.service(service)?.plugin === '@deepseek-ai/dsh-' + (name === 'sandbox' ? 'sandbox-local' : 'subprocess-local') }));
       }
     };
@@ -318,7 +349,7 @@ export async function mountMemberHost(ctx, { core, coreStore, hostCapability, up
         const allow = names.filter(name => capabilities.toolAllowed(policy, name, agent));
         const disposers = [
           ...(!capabilities.toolAllowed(policy, 'run_code', agent) && scope.tools.modeFor(agent) !== 'native' ? [scope.tools.presentAs('native')] : []),
-          scope.tools.restrict(policy.tools === null ? { deny: names.filter(name => !allow.includes(name)) } : { allow }),
+          scope.tools.restrict(policy.toolMode === 'whitelist' ? { allow } : { deny: names.filter(name => !allow.includes(name)) }),
           scope.tools.guard(exec => capabilities.toolDenial(exec, modeOf(exec?.agent?.session ?? agent.session))),
           scope.on('tools/pre-execute', async (exec, next) => {
             const reason = await memberPathDenial(exec, cwd, { realpath, sharedDirectories: capabilities.directories(binding.userId) });
@@ -333,8 +364,9 @@ export async function mountMemberHost(ctx, { core, coreStore, hostCapability, up
       const withCatalog = section === 'full' || section === 'catalog';
       const usageBoard = withUsage ? await usage.refresh() : snapshot.usage;
       await synchronizeHomes();
-      let toolCatalog, skillCatalog, agentPresetCatalog, permissionPresetCatalog, pluginCatalog, mcpCatalog, unAttributedTools, skillCatalogComplete = true;
+      let toolCatalog, skillCatalog, agentPresetCatalog, permissionPresetCatalog, pluginCatalog, mcpCatalog, cliCatalog, unAttributedTools, skillCatalogComplete = true;
       if (withCatalog && (snapshot.admin || snapshot.preferences)) {
+        cliCatalog = [...(ctx.get('lanCliTools')?.catalog() ?? []), ...(await ctx.get('lanCliTools')?.execution?.catalog() ?? [])];
         const names = new Set(ctx.tools.schemas().map(row => row.name));
         const skills = new Map();
         const plugins = new Map(), servers = new Set(), unknown = new Set();
@@ -379,20 +411,24 @@ export async function mountMemberHost(ctx, { core, coreStore, hostCapability, up
       // revoke/change. Filter host metadata against the latest authorized view.
       if (revalidate) snapshot = await revalidate();
       const personalCatalog = withCatalog && snapshot.preferences ? Object.fromEntries([
-        ['skills', skillCatalog], ['agentPresets', agentPresetCatalog], ['permissionPresets', permissionPresetCatalog], ['plugins', pluginCatalog], ['mcpServers', mcpCatalog],
+        ['skills', skillCatalog], ['agentPresets', agentPresetCatalog], ['permissionPresets', permissionPresetCatalog], ['plugins', pluginCatalog], ['mcpServers', mcpCatalog], ['cliTools', cliCatalog],
       ].map(([field, rows]) => [field, (rows ?? []).filter(row => !['plugins', 'mcpServers'].includes(field) || row.memberIsolated).filter(row => snapshot.preferences.granted[field] === null || snapshot.preferences.granted[field].includes(row.id)).map(row => ({ id: row.id, label: row.label ?? row.name ?? row.id, ...(row.description ? { description: row.description } : {}) }))])) : null;
       return { ...snapshot, memberUrl: setup.state.memberOrigin + '/lan/', ...(personalCatalog ? { preferences: { ...snapshot.preferences, catalog: personalCatalog, skillCatalogComplete, directoryBoundary: executionBoundary.snapshot() } } : {}), branding: branding.snapshot(), usage: withUsage ? usageBoard : snapshot.usage, limits: limits.snapshot(snapshot.user.id), capabilities: { ...snapshot.capabilities, ...projects.capabilities(), directoryBoundary: executionBoundary.snapshot() }, home: publicHome(await homes.own(snapshot.user.id)),
-        ...(snapshot.admin ? { admin: { ...snapshot.admin, users: snapshot.admin.users.map(user => ({ ...user, limits: limits.snapshot(user.id) })), ...(withCatalog ? { toolCatalog, skillCatalog, skillCatalogComplete, agentPresetCatalog, permissionPresetCatalog, pluginCatalog, mcpCatalog, unAttributedTools } : {}), homeDirectory: await homes.policy(), setup: setup.snapshot(), isolationCheck: isolation.snapshot() } } : {}) };
+        ...(snapshot.admin ? { admin: { ...snapshot.admin, users: snapshot.admin.users.map(user => ({ ...user, limits: limits.snapshot(user.id) })), ...(withCatalog ? { toolCatalog, skillCatalog, skillCatalogComplete, agentPresetCatalog, permissionPresetCatalog, pluginCatalog, mcpCatalog, cliCatalog, unAttributedTools } : {}), homeDirectory: await homes.policy(), setup: setup.snapshot(), isolationCheck: isolation.snapshot() } } : {}) };
     };
     async function accountChanged(args, result) {
+      if (args.userId && /^(?:admin\.|owner\.)/.test(args.action)) await ctx.get('workspaceBrowser')?.closeUser(args.userId);
+      if (args.action === 'preferences.update' && result.user?.id) await ctx.get('workspaceBrowser')?.closeUser(result.user.id);
       if (['bootstrap', 'redeem', 'admin.createUser'].includes(args.action)) await synchronizeHomes();
       if (args.action === 'admin.batchUpdateAccess') {
         const affected = new Set(result.updatedUserIds);
+        await Promise.all([...affected].map(userId => ctx.get('workspaceBrowser')?.closeUser(userId)));
         await Promise.all(projects.state.projects.filter(entry => affected.has(entry.userId)).map(entry => projects.stop(entry.projectId)));
         ctx.remoteAccess.invalidate();
         ctx.get('permissionPresets')?.emitCatalogChanged();
       }
       if (args.action === 'password.change') {
+        await ctx.get('workspaceBrowser')?.closeUser(result.userId);
         await auth.revokeUser(result.userId);
         await Promise.all(projects.state.projects.filter(entry => entry.userId === result.userId).map(entry => projects.stop(entry.projectId)));
         ctx.remoteAccess.invalidate();
@@ -414,6 +450,8 @@ export async function mountMemberHost(ctx, { core, coreStore, hostCapability, up
       }
     }
     async function execute(request, caller) {
+      if (request.action === 'admin.cliTools') return cliManagement.execute(request, caller);
+      if (['browser.available', 'browser.operate'].includes(request.action)) return operateBrowser(request, caller);
       request = setup.defaults(request);
       await updateProviders({ background: !requiresModelCatalog(request.action) });
       if (request.action === 'admin.completeSetup') return setup.complete(request, caller);
@@ -433,6 +471,38 @@ export async function mountMemberHost(ctx, { core, coreStore, hostCapability, up
       const snapshot = await homeSnapshot(result, request, () => core.execute(request, caller));
       return { ...snapshot, ...(snapshot.admin ? { admin: { ...snapshot.admin, ...(catalog ? { catalogStatus: catalog.status() } : {}) } } : {}) };
     }
+    const cliManagement = new CliManagement({ core, editor: ctx.get('configEditor'), onChanged: async () => {
+      await Promise.all(projects.state.projects.map(entry=>projects.stop(entry.projectId)));
+      ctx.remoteAccess.invalidate();
+      ctx.get('permissionPresets')?.emitCatalogChanged();
+    } });
+    const executionPrincipal = exec => {
+      const agent = exec.agent;
+      if (!agent?.id || !agent.session) reject('EXECUTION_TOOL_DENIED', 'Installed tools require a current DSH session.', 403);
+      const scoped = models.userOf(agent.id), directory = ownership.bindingForCwd(agent.session.header?.cwd)?.userId;
+      const userId = scoped ?? directory, caller = models.requestUser({ sessionId: agent.id });
+      if (scoped && directory && scoped !== directory || caller && caller !== userId) reject('EXECUTION_TOOL_DENIED', 'Execution belongs to another account.', 403);
+      return { userId, member: !!userId, administrator: !!userId && core.memberIsAdministrator(userId, hostCapability), ...(userId ? { policy: capabilities.policy(userId) } : {}) };
+    };
+    cleanup.push(ctx.tools.register(executionToolsDefinition({
+      catalogOf: () => ctx.get('lanCliTools')?.execution,
+      principalOf: executionPrincipal,
+      workspaceOf: async (exec, principal) => {
+        const cwd = await (exec.agent.ctx ?? ctx).get('workingDirectory').ensure(exec.agent, exec.signal);
+        if (principal.member) {
+          const binding = ownership.bindingForCwd(exec.agent.session.header?.cwd);
+          if (!binding || binding.userId !== principal.userId) reject('EXECUTION_TOOL_DENIED', 'A private member workspace is required.', 403);
+          const home = memberHome(binding);
+          if (cwd !== home && !cwd.startsWith(home + '/')) reject('EXECUTION_TOOL_DENIED', 'Run installed tools from the current private workspace.', 403);
+        }
+        return cwd;
+      },
+      run: async ({ argv, cwd, tool, exec, principal }) => executionToolRuntime.run({ userId: principal.userId, paths: tool.runtime.paths }, async () => {
+        const context = exec.agent.ctx ?? ctx;
+        ensureExecutionContext(context);
+        return runNativeExecutionTool({ argv, cwd, tool, exec, context, principal });
+      }),
+    })));
     const ownerBridge = { current: null };
     const frontendDist = config.frontendDist || resolve(dirname(resolveHostPackage('@deepseek-ai/dsh-web-frontend/package.json')), 'dist');
     const desktop = installAdministratorDesktop(ctx.get('webServer'), ctx.get('connection'));
@@ -461,7 +531,7 @@ export async function mountMemberHost(ctx, { core, coreStore, hostCapability, up
       userPage: result => ({ ...result, items: result.items.map(user => ({ ...user, limits: limits.snapshot(user.id) })) }),
       usagePage: async (request, caller) => { await usage.refresh(); return core.execute(request, caller); },
       administerContent: (request, caller) => administration.execute(request, caller),
-      checkIsolation: isolation.check, accountChanged, setOwnerAction(handler) { ownerBridge.current = handler; }, close };
+      checkIsolation: isolation.check, accountChanged, operateBrowser, manageCliTools: (request,caller)=>cliManagement.execute(request,caller), setOwnerAction(handler) { ownerBridge.current = handler; }, close };
   } catch (error) {
     try { await close(); } catch (cleanupError) { throw new AggregateError([error, cleanupError], 'Member initialization and cleanup failed'); }
     throw error;

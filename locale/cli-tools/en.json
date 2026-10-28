@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Execution Tools",
+    "description": "Register server CLI commands and tool-runner tools, with account-scoped access to commands, dependencies and permitted operations."
+  }
+}

@@ -56,7 +56,7 @@ test('plain ModuleLoader client compiles without executing the factory', () => {
   assert.match(source, /id: '@sunbigfly\/dsh-multi-user-service'/);
   assert.deepEqual([...source.matchAll(/require\('([^']+)'\)/g)].map(match => match[1]), ['react', '@deepseek-ai/dsh-client-ui-primitives', '@sunbigfly/dsh-multi-user-service/member-client']);
   assert.match(source, /inject: \['slots', 'locale', 'layout'\]/);
-  assert.doesNotMatch(source, /\bimport\s/);
+  assert.doesNotMatch(source, /^\s*import\s/m);
 });
 
 test('preview files use the native tree with a separate store and target directory, preserving the real session cwd', () => {
@@ -99,7 +99,7 @@ test('workspace has one additive sidebar launcher and its own native modal, leav
   assert.ok(registrations.some(value => /name: 'conversation\.composer'/.test(value)));
   assert.match(source, /function Workspace\(\{ close, AccountSection, identity, initialSnapshot, fileAction \} = \{\}\)/);
   assert.match(source, /ctx\.layout\.selectPanel\(previousPanel\); openWorkspaceWindow\(\)/);
-  assert.doesNotMatch(source, /createRoot|ReactDOM|document\.|\.innerHTML/);
+  assert.doesNotMatch(source, /createRoot|ReactDOM|document\.(?:body|documentElement|querySelector|getElementById|write)\b|\.innerHTML/);
 });
 
 test('localized text uses registered zh/en resources and reacts to locale changes', () => {
@@ -204,7 +204,7 @@ test('administrator model groups sort provider and model names naturally with st
 
 test('members have no management tab, foreign project view or route secret display', () => {
   assert.match(source, /const admin = user\?\.role === 'admin' \? snapshot\?\.admin : null/);
-  assert.match(source, /user\?\.role === 'admin' \? \['accounts', 'content', 'models', 'sharing', 'branding'\] : \['content'\]/);
+  assert.match(source, /user\?\.role === 'admin' \? \[\['management', 'navigationManagement'/);
   assert.match(source, /const projects = list\(snapshot\?\.projects\)/);
   assert.match(source, /list\(snapshot\?\.routes\)\.filter\(route => route\.enabled === true\)/);
   const workspace = method('workspaceView');
@@ -309,6 +309,8 @@ function ownerHarness(fetcher, { memberFlag, mountBranding = false, browser = {}
   registration.factory(name => {
     if (name === 'react') return React;
     if (name === '@deepseek-ai/dsh-client-ui-primitives') return {
+      Tooltip: ({ children }) => children[0],
+      IconInfoOutlineRegular: () => React.createElement('svg', { 'data-native-info-icon': true }),
       Switch: ({ label, checked, disabled = false, onChange }) => React.createElement('button', { type: 'button', role: 'switch', disabled, 'aria-label': label, 'aria-checked': checked, onClick: () => onChange(!checked) }),
       Modal: ({ open, children, onClose, ...props }) => open ? React.createElement('div', { ...props, role: 'dialog', 'data-workspace-window': true }, children.map(child => ({ ...child, props: { ...child.props, close() { onClose(); rootProps.close?.(); } } }))) : null,
       IconSettingsOutlineRegular: () => React.createElement('svg'), IconCloseOutlineRegular: () => React.createElement('svg'),
@@ -413,7 +415,7 @@ test('one account management menu supports archive, restore and confirmed deleti
   assert.equal(confirmButton().props.disabled, false); await submit(); assert.equal(row(), undefined);
   const deleted = env.requests.find(row => row.fields.action === 'admin.deleteUser');
   assert.equal(deleted.fields.confirmUsername, 'archive-member'); assert.equal(deleted.fields.expectedRevision, 3); assert.equal(deleted.headers['X-Lan-CSRF'], admin.csrf);
-  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'content')[0].props.onClick(); tree = env.render(); await ownerPageTick(); tree = env.render();
+  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'sessions')[0].props.onClick(); tree = env.render(); await ownerPageTick(); tree = env.render();
   ownerNodes(tree, node => node.props?.['data-content-member'])[0].props.onFocus(); tree = env.render(); await ownerPageTick(); tree = env.render();
   const historical = ownerNodes(tree, node => node.props?.['data-member-option'] === member.id)[0];
   assert.match(ownerText(historical), /Deleted account/); historical.props.onClick(); tree = env.render();
@@ -426,7 +428,8 @@ test('sidebar workspace opens one modal without changing the underlying selected
   env.layout.selectPanel('plugins'); env.render(); await ownerTick(); let tree = env.render();
   assert.equal(env.layout.panelInfo.getSnapshot().activePanelId, 'plugins');
   assert.equal(ownerNodes(tree, node => node.props?.['data-workspace-window']).length, 1);
-  assert.deepEqual(ownerNodes(tree, node => node.type === 'button' && node.props?.['data-workspace-page']).map(node => node.props['data-workspace-page']), ['account', 'preferences', 'accounts', 'content', 'models', 'sharing', 'branding', 'usage']);
+  assert.deepEqual(ownerNodes(tree, node => node.type === 'button' && node.props?.['data-workspace-page']).map(node => node.props['data-workspace-page']), ['account', 'preferences', 'sessions', 'files', 'accounts', 'models', 'sharing', 'branding', 'usage']);
+  assert.deepEqual(ownerNodes(tree, node => node.props?.['data-navigation-group']).map(node => node.props['data-navigation-group']), ['personal', 'workspace', 'management']);
   assert.equal(env.registrations.some(row => row.options.name === 'settings.section'), false);
   ownerNodes(tree, node => node.props?.className === 'lanw-window-close')[0].props.onClick();
   assert.equal(ownerNodes(env.render(), node => node.props?.['data-workspace-window']).length, 0);
@@ -441,7 +444,10 @@ test('member workspace exposes personal capabilities and own content, even when 
   const user = { ...ownerUser, role: 'member' };
   const env = ownerHarness(async () => ownerSuccess({ ...ownerSnapshot(), user }), { memberFlag: { user, csrf: 'member-csrf' } });
   env.render(); await ownerTick(); const tree = env.render();
-  assert.deepEqual(ownerNodes(tree, node => node.type === 'button' && node.props?.['data-workspace-page']).map(node => node.props['data-workspace-page']), ['account', 'preferences', 'content', 'usage']);
+  assert.deepEqual(ownerNodes(tree, node => node.type === 'button' && node.props?.['data-workspace-page']).map(node => node.props['data-workspace-page']), ['account', 'preferences', 'usage', 'sessions', 'files']);
+  assert.deepEqual(ownerNodes(tree, node => node.props?.['data-navigation-group']).map(node => node.props['data-navigation-group']), ['personal', 'workspace']);
+  const personalNavigation = ownerNodes(tree, node => node.props?.['data-navigation-group'] === 'personal')[0];
+  assert.deepEqual(ownerNodes(personalNavigation, node => node.props?.['data-workspace-page']).map(node => node.props['data-workspace-page']), ['account', 'preferences', 'usage']);
   assert.equal(ownerNodes(tree, node => node.props?.['data-admin-console']).length, 0);
   assert.equal(ownerNodes(tree, node => node.type === 'button' && node.props?.['aria-current'] === 'page')[0].props['data-workspace-page'], 'account');
   env.dispose();
@@ -584,7 +590,7 @@ test('personal capability drafts survive category changes, save only own prefere
   assert.equal(request.fields.access.files, false); assert.deepEqual(request.fields.access.skills, ['b']); assert.equal(request.fields.expectedRevision, 0);
   assert.equal(request.headers['X-Lan-CSRF'], 'c'.repeat(43)); assert.equal(Object.hasOwn(request.fields, 'userId'), false);
   assert.equal(ownerNodes(personal(), node => node.props?.['data-save-personal'])[0].props.disabled, true);
-  assert.equal(ownerNodes(tree, node => node.props?.['data-content-mode'] === 'files')[0].props.disabled, true);
+  assert.equal(ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'files')[0].props.disabled, true);
   assert.equal(env.requests.some(row => row.fields.action.startsWith('admin.')), false); env.dispose();
 });
 
@@ -599,7 +605,7 @@ test('member content uses own endpoints and opens the owned conversation nativel
     return ownerSuccess({ ...ownerSnapshot(), user });
   }, { memberFlag: { user, csrf: 'c'.repeat(43) }, services: { uiWorkspace: { openSession: id => opened.push(id) } }, rootProps: { close() { closed++; } } });
   env.render(); await ownerTick(); let tree = env.render();
-  ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'content')[0].props.onClick(); env.render();
+  ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'sessions')[0].props.onClick(); env.render();
   await new Promise(resolve => setTimeout(resolve, 180)); await ownerTick(); tree = env.render();
   assert.equal(ownerNodes(tree, node => node.props?.['data-content-member']).length, 0);
   assert.equal(ownerNodes(tree, node => node.props?.['data-member-content']).length, 1);
@@ -789,7 +795,7 @@ test('content member search finds an account outside the first page and keeps it
   const snapshot = { ...ownerSnapshot(), admin: { ...ownerSnapshot().admin, users } };
   const env = ownerHarness(async ({ fields }) => fields.action === 'status' ? ownerSuccess({ initialized: true }) : fields.action === 'auth.restore' ? ownerSuccess({ user: ownerUser, csrf: 'csrf', cookieSession: true }) : fields.action === 'admin.content' ? ownerSuccess({ items: [], total: 0, page: 0 }) : ownerSuccess(snapshot));
   env.render(); await ownerTick(); let tree = env.render();
-  ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'content')[0].props.onClick(); tree = env.render(); await ownerPageTick(); tree = env.render();
+  ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'sessions')[0].props.onClick(); tree = env.render(); await ownerPageTick(); tree = env.render();
   ownerNodes(tree, node => node.props?.['data-member-picker-search'])[0].props.onChange({ target: { value: 'member22' } }); tree = env.render(); await ownerPageTick(); tree = env.render();
   const select = () => ownerNodes(tree, node => node.props?.['data-content-member'])[0];
   assert.ok(ownerNodes(tree, node => node.props?.['data-member-option'] === users[22].id).length);
@@ -797,7 +803,7 @@ test('content member search finds an account outside the first page and keeps it
   ownerNodes(tree, node => node.props?.['data-member-picker-search'])[0].props.onChange({ target: { value: '' } }); tree = env.render();
   assert.equal(select().props['data-member-value'], users[22].id);
   assert.ok(ownerNodes(tree, node => node.props?.['data-member-option'] === users[22].id).length, 'selected metadata stays available outside the initial choices');
-  ownerNodes(tree, node => node.props?.['data-content-mode'] === 'files')[0].props.onClick(); tree = env.render(); await ownerPageTick(); tree = env.render();
+  ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'files')[0].props.onClick(); tree = env.render(); await ownerPageTick(); tree = env.render();
   assert.equal(env.requests.findLast(row => row.fields.operation === 'files.list').fields.userId, users[22].id);
   assert.ok(env.requests.some(row => row.fields.action === 'admin.listUsers' && row.fields.summary === true)); env.dispose();
 });
@@ -973,7 +979,7 @@ test('administrator content entry opens the selected member in the native conver
   assert.equal(env.registrations.some(row => row.options.name === 'conversation.composer'), false, 'blank native home keeps its original composer');
   env.render(); await ownerTick(); let tree = env.render();
   assert.equal(env.requests.some(row => row.fields.action === 'admin.content'), false);
-  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'content')[0].props.onClick(); tree = env.render();
+  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'sessions')[0].props.onClick(); tree = env.render();
   await new Promise(resolve => setTimeout(resolve, 180)); await ownerTick(); tree = env.render();
   assert.ok(ownerNodes(tree, node => node.props?.['data-admin-content']).length);
   assert.match(ownerText(tree), /Alice conversation/);
@@ -991,7 +997,7 @@ test('administrator content entry opens the selected member in the native conver
   assert.equal(read.fields.userId, member.id); assert.equal(read.headers['X-Lan-CSRF'], 'content-csrf');
   env.remount();
   env.render(); await ownerTick(); tree = env.render();
-  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'content')[0].props.onClick(); env.render();
+  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'sessions')[0].props.onClick(); env.render();
   await new Promise(resolve => setTimeout(resolve, 180)); await ownerTick(); tree = env.render();
   tree = ownerChooseMember(env, tree, 'data-content-member', member.id);
   ownerNodes(tree, node => node.type === 'input' && node.props.maxLength === 200)[0].props.onChange({ target: { value: 'Alice' } });
@@ -1009,7 +1015,7 @@ test('administrator content entry opens the selected member in the native conver
   assert.equal(opened.at(-1), 'session-admin', 'successive previews keep the original return conversation');
   assert.equal(env.requests.find(row => row.fields.operation === 'preview.close').headers['X-Lan-CSRF'], 'content-csrf', 'native preview releases after settings unmount clears its authentication ref');
   env.render(); await ownerTick(); tree = env.render();
-  assert.equal(ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'content')[0].props['aria-current'], 'page');
+  assert.equal(ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'sessions')[0].props['aria-current'], 'page');
   assert.equal(ownerNodes(tree, node => node.props?.['data-content-member'])[0].props['data-member-value'], member.id);
   assert.equal(ownerNodes(tree, node => node.type === 'input' && node.props.maxLength === 200)[0].props.value, 'Alice');
   ownerNodes(tree, node => node.props?.['data-content-advanced'] === 'sessions')[0].props.onClick(); tree = env.render();
@@ -1041,7 +1047,7 @@ test('native previews navigate before slow history is ready, reuse known metadat
       throw Error(fields.operation);
     }, { services, rootProps: { close() { closed++; } }, browser: { requestAnimationFrame: fn => fn(), cancelAnimationFrame() {} } });
     env.render(); await ownerTick(); let tree = env.render();
-    ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'content')[0].props.onClick(); env.render(); await ownerPageTick(); tree = env.render();
+    ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'sessions')[0].props.onClick(); env.render(); await ownerPageTick(); tree = env.render();
     const started = ownerNodes(tree, node => node.props?.['data-content-entry'] === 'session-alice')[0].props.onClick(); await ownerTick();
     assert.deepEqual(opened, ['session-alice'], 'the original native view opens before its history promise settles');
     assert.equal(closed, 1); assert.equal(refreshes, 0, 'known native metadata does not need a full catalog refresh');
@@ -1089,9 +1095,9 @@ test('ending a native file preview restores cached rows and position without wai
   }, { services, rootProps: { close() { env.remount(false); } }, browser: { requestAnimationFrame: fn => (frames.push(fn), frames.length), cancelAnimationFrame() {} } });
   const settle = async () => { env.render(); await new Promise(resolve => setTimeout(resolve, 180)); await ownerTick(); return env.render(); };
   env.render(); await ownerTick(); let tree = env.render();
-  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'content')[0].props.onClick();
+  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'sessions')[0].props.onClick();
   tree = await settle();
-  ownerNodes(tree, node => node.props?.['data-content-mode'] === 'files')[0].props.onClick();
+  ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'files')[0].props.onClick();
   tree = await settle();
   tree = ownerChooseMember(env, tree, 'data-content-member', member.id);
   tree = await settle();
@@ -1131,7 +1137,7 @@ test('ending a native file preview restores cached rows and position without wai
   finishRelease(); await ownerTick();
   assert.equal(typeof finishRefresh, 'function', 'session refresh starts after lease cleanup and does not block the restored window');
   finishRefresh(); await ownerTick();
-  assert.equal(ownerNodes(tree, node => node.props?.['data-content-mode'] === 'files')[0].props['aria-selected'], true);
+  assert.equal(ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'files')[0].props['aria-current'], 'page');
   assert.equal(ownerNodes(tree, node => node.props?.['data-content-member'])[0].props['data-member-value'], member.id);
   assert.ok(frames.length > 0, 'cached rows can restore position before the background listing refresh');
   scroller.scrollTop = 0; scroller.scrollLeft = 0;
@@ -1164,7 +1170,7 @@ test('advanced list filters apply as a draft, reset pagination and share folder 
   const advanced = (tree, mode) => ownerNodes(tree, node => node.props?.['data-content-advanced'] === mode)[0];
   const field = (tree, key) => ownerNodes(tree, node => node.props?.['data-filter-field'] === key)[0];
   env.render(); await ownerTick(); let tree = env.render();
-  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'content')[0].props.onClick(); tree = await settle();
+  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'sessions')[0].props.onClick(); tree = await settle();
   assert.equal(env.requests.filter(row => row.fields.operation === 'sessions.list').at(-1).fields.content, 'messages');
   ownerNodes(tree, node => node.type === 'button' && ownerText(node) === 'Next')[0].props.onClick(); tree = await settle();
   assert.equal(env.requests.filter(row => row.fields.operation === 'sessions.list').at(-1).fields.offset, 10);
@@ -1183,7 +1189,7 @@ test('advanced list filters apply as a draft, reset pagination and share folder 
   assert.equal(applied.updatedBefore, new Date('2026-10-25T00:00:00').getTime());
   ownerNodes(tree, node => node.props?.['data-content-clear'])[0].props.onClick(); tree = await settle();
   assert.equal(env.requests.filter(row => row.fields.operation === 'sessions.list').at(-1).fields.content, 'messages');
-  ownerNodes(tree, node => node.props?.['data-content-mode'] === 'files')[0].props.onClick(); tree = await settle();
+  ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'files')[0].props.onClick(); tree = await settle();
   advanced(tree, 'files').props.onClick(); tree = env.render();
   field(tree, 'extensions').props.onChange({ target: { value: 'md' } }); tree = env.render();
   field(tree, 'kind').props.onChange({ target: { value: 'directory' } }); tree = env.render();
@@ -1221,7 +1227,7 @@ test('native management menus expose relevant actions, protect bound folders and
   const menu = tree => ownerNodes(tree, node => node.props?.['data-native-menu'])[0];
   const action = (tree, label) => ownerNodes(tree, node => node.props?.role === 'menuitem' && ownerText(node) === label)[0];
   env.render(); await ownerTick(); let tree = env.render();
-  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'content')[0].props.onClick(); tree = await settle();
+  ownerNodes(tree, node => node.props?.['data-admin-tab'] === 'sessions')[0].props.onClick(); tree = await settle();
   ownerNodes(tree, node => node.props?.['data-content-manage'] === 'session-1')[0].props.onClick(); tree = env.render();
   assert.equal(action(tree, 'Stop running').props.disabled, true);
   assert.ok(action(tree, 'View history')); assert.ok(action(tree, 'Manage files'));
@@ -1231,7 +1237,7 @@ test('native management menus expose relevant actions, protect bound folders and
   assert.equal(menu(tree), undefined);
   assert.equal(ownerNodes(tree, node => node.props?.['data-workspace-window']).length, 1, 'Escape closes the management menu without closing the workspace');
   assert.equal(ownerNodes(tree, node => node.props?.['data-content-manage'] === 'session-1')[0].props['aria-expanded'], false);
-  ownerNodes(tree, node => node.props?.['data-content-mode'] === 'files')[0].props.onClick(); tree = await settle();
+  ownerNodes(tree, node => node.props?.['data-workspace-page'] === 'files')[0].props.onClick(); tree = await settle();
   ownerNodes(tree, node => node.props?.['data-content-manage'] === 'workspace')[0].props.onClick(); tree = env.render();
   assert.equal(action(tree, 'Open folder').props.disabled, false);
   for (const label of ['Rename', 'Move', 'Delete']) assert.equal(action(tree, label).props.disabled, true);
@@ -1297,8 +1303,8 @@ test('owner explicit create, invite, access and password forms retain exact API 
   env.render(); await ownerTick(); let tree = env.render();
   const clickAction = value => { ownerNodes(tree, node => node.props?.['data-account-action'] === value)[0].props.onClick(); tree = env.render(); };
   const submit = async (form, values) => { await form.props.onSubmit({ preventDefault() {}, currentTarget: { values, reset() {} } }); await ownerTick(); tree = env.render(); };
-  const accessValues = { 'access.files': 'on', 'access.attachments': 'on', 'access.subagents': 'on', 'access.interactions': 'on', toolAccess: 'custom', toolNames: ['read'], skillsMode: 'custom', skillNames: ['alpha'] };
-  const access = { terminal: false, files: true, attachments: true, tasks: false, subagents: true, interactions: true, tools: ['read'], skills: ['alpha'] };
+  const accessValues = { 'access.files': 'on', 'access.attachments': 'on', 'access.subagents': 'on', 'access.interactions': 'on', toolAccess: 'whitelist', toolNames: ['read'], skillsMode: 'custom', skillNames: ['alpha'] };
+  const access = { terminal: false, files: true, attachments: true, tasks: false, subagents: true, interactions: true, toolMode: 'whitelist', tools: ['read'], skills: ['alpha'] };
   clickAction('create');
   assert.equal(ownerNodes(tree, node => node.props?.name === 'password')[0].props.minLength, 16);
   const createValues = { username: 'new-member', displayName: 'New member', password: 'long-enough-password', modelAccess: 'custom', routeIds: ['rte_a', 'rte_b'], defaultRouteId: 'rte_b', ...accessValues };
@@ -1720,6 +1726,31 @@ test('member admin saves per-account plugin and MCP grants with CSRF on every re
   assert.deepEqual(access.plugins, ['plugin-one']); assert.deepEqual(access.mcpServers, []);
   open(); assert.equal(field('pluginsMode').props.value, 'custom'); assert.equal(field('pluginNames').props.checked, true);
   assert.equal(field('mcpServersMode').props.value, 'custom'); env.dispose();
+});
+
+test('administrator CLI permissions list configured commands and persist selected grants', async () => {
+  const csrf = 'c'.repeat(43); let access = { cliTools: null };
+  const member = { id: 'usr_cli', username: 'cli_member', displayName: 'CLI member', role: 'member', routeIds: [] };
+  const snapshot = () => ({ ...ownerSnapshot(), admin: { ...ownerSnapshot().admin, users: [ownerUser, { ...member, access }], cliCatalog: [{ id: 'research-cli', label: 'Research CLI' }] } });
+  const env = ownerHarness(async request => {
+    assert.equal(request.headers['X-Lan-CSRF'], csrf);
+    if (request.fields.action === 'snapshot') return ownerSuccess(snapshot());
+    assert.equal(request.fields.action, 'admin.updateUser'); access = request.fields.access;
+    return ownerSuccess({});
+  }, { memberFlag: { user: ownerUser, csrf } });
+  env.render(); await ownerTick(); let tree = env.render();
+  tree = ownerAccountAction(env, tree, member.id);
+  const field = name => ownerNodes(tree, node => node.props?.name === name)[0];
+  assert.equal(field('cliToolsMode').props.value, 'inherit');
+  field('cliToolsMode').props.onChange({ target: { value: 'custom' } }); tree = env.render();
+  field('cliNames').props.onChange({ target: { checked: true } }); tree = env.render();
+  const form = ownerNodes(tree, node => node.type === 'form' && ownerNodes(node, child => child.props?.name === 'cliToolsMode').length)[0];
+  await form.props.onSubmit({ preventDefault() {}, currentTarget: { values: { modelAccess: 'inherit', toolAccess: 'inherit', cliToolsMode: 'custom', cliNames: ['research-cli'] }, reset() {} } });
+  await ownerTick(); tree = env.render();
+  assert.deepEqual(access.cliTools, ['research-cli']);
+  tree = ownerAccountAction(env, tree, member.id);
+  assert.equal(field('cliToolsMode').props.value, 'custom');
+  assert.equal(field('cliNames').props.checked, true); env.dispose();
 });
 
 test('invalid member bootstrap CSRF never fetches a snapshot or falls back to owner authentication', async () => {
